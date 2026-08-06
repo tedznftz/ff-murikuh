@@ -612,12 +612,6 @@ input{font:inherit}
 
 /* ================= the floor ================= */
 .floor-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.floor-head .size{font-family:var(--cut);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory-dim)}
-.floor-head select{
-  background:transparent;border:1px solid rgba(199,162,69,.32);color:var(--ivory);
-  font-family:var(--body);font-size:14px;padding:5px 8px;border-radius:1px;margin-left:8px;
-}
-.floor-head option{color:#332A1B}
 .link{
   background:transparent;border:0;padding:0;color:var(--brass);font-family:var(--cut);
   font-size:10px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid rgba(199,162,69,.4);
@@ -625,15 +619,6 @@ input{font:inherit}
 .link:hover{color:#F0E2B8}
 .tuck{margin-top:22px}
 .tuck .paper{margin-top:14px}
-.compose{border:1px dashed rgba(199,162,69,.35);border-radius:2px;padding:18px;margin-bottom:22px}
-.compose h4{margin:0 0 12px;font-family:var(--cut);font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
-.compose input,.compose textarea{
-  width:100%;background:rgba(0,0,0,.25);border:1px solid rgba(199,162,69,.25);border-radius:1px;
-  color:var(--ivory);font-family:var(--body);font-size:15.5px;padding:9px 11px;margin-bottom:9px;
-}
-.compose textarea{resize:vertical;min-height:4.4em}
-.compose input:focus,.compose textarea:focus{outline:0;border-color:var(--brass)}
-.compose input::placeholder,.compose textarea::placeholder{color:rgba(183,172,150,.45);font-style:italic}
 .prop-strike{background:transparent;border:0;color:rgba(200,193,178,.45);font-family:var(--cut);font-size:9.5px;
   letter-spacing:.18em;text-transform:uppercase;padding:0}
 .prop-strike:hover{color:#C97A6A}
@@ -1121,23 +1106,7 @@ body.shake{animation:pageShake .42s ease}
   </div>
 
   <div class="floor-head">
-    <span class="size">League size
-      <select id="teamCount" title="How many owners vote">
-        <option>8</option><option>10</option><option selected>12</option><option>14</option><option>16</option>
-      </select>
-    </span>
     <span class="src" id="floorCount"></span>
-  </div>
-
-  <button class="link" id="btnComposeToggle" style="display:block;margin-bottom:22px">Put something on the floor</button>
-  <div class="compose" id="composePanel" hidden>
-    <h4>New proposal</h4>
-    <input type="text" id="npTitle" placeholder="What the amendment is called">
-    <input type="text" id="npOwner" placeholder="Who's proposing it">
-    <textarea id="npDesc" placeholder="What it changes, and why it's worth doing"></textarea>
-    <div class="btn-row" style="margin-top:4px">
-      <button class="btn" id="btnAddProp">Add to the floor</button>
-    </div>
   </div>
 
   <div id="props"></div>
@@ -1919,21 +1888,6 @@ function makeSeat(pid,num){
   });
   return b;
 }
-$("btnComposeToggle").addEventListener("click",function(){
-  var pnl=$("composePanel"); pnl.hidden=!pnl.hidden;
-  this.textContent=pnl.hidden?"Put something on the floor":"Hide the proposal form";
-  if(!pnl.hidden) $("npTitle").focus();
-});
-$("btnAddProp").addEventListener("click",function(){
-  var t=$("npTitle").value.trim(), o=$("npOwner").value.trim(), d=$("npDesc").value.trim();
-  if(!t){ $("npTitle").focus(); say("Give the amendment a name first.","err"); return; }
-  floor.unshift({id:"m"+Date.now(),src:"manual",title:t,owner:o||"Anonymous",desc:d,why:"",note:""});
-  $("npTitle").value=""; $("npOwner").value=""; $("npDesc").value="";
-  saveFloor(); renderFloor();
-});
-$("teamCount").addEventListener("change",function(){
-  teams=parseInt(this.value,10)||12; store.set("ffm:teams",String(teams)); renderFloor();
-});
 $("btnCopy").addEventListener("click",function(){
   if(!floor.length){ say("Nothing on the floor to tally.","err"); return; }
   var lines=["FF MURIKUH \u2014 ON THE FLOOR","Majority = "+threshold()+" of "+teams,""];
@@ -2065,7 +2019,7 @@ Promise.all([store.get("ffm:base"),store.get("ffm:votes"),store.get("ffm:teams")
   try{ stored=v[0]?JSON.parse(v[0]):null; }catch(e){ stored=null; }
   seasons=merge(stored);
   try{ votes=v[1]?JSON.parse(v[1]):{}; }catch(e){ votes={}; }
-  if(v[2]){ teams=parseInt(v[2],10)||12; $("teamCount").value=teams; }
+  if(v[2]){ teams=parseInt(v[2],10)||12; }
   try{ rules=v[4]?JSON.parse(v[4]):DEFAULT_RULES.slice(); }catch(e){ rules=DEFAULT_RULES.slice(); }
   if(!Array.isArray(rules)) rules=DEFAULT_RULES.slice();
   try{ floor=v[5]?JSON.parse(v[5]):[]; }catch(e){ floor=[]; }
