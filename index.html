@@ -680,19 +680,25 @@ input{font:inherit}
   75%{transform:scale(1.08) rotate(-1.5deg)}
   100%{transform:scale(1) rotate(0)}
 }
-.seats{display:flex;gap:5px;flex-wrap:wrap;margin-top:16px}
-.seat{width:33px;height:33px;border-radius:50%;border:1px solid rgba(199,162,69,.3);background:transparent;
-  color:var(--ivory-dim);font-family:var(--cut);font-size:12px;transition:transform .15s}
-.seat:hover{transform:scale(1.1);border-color:var(--brass)}
-.seat.yea{background:#5A7A4E;border-color:#5A7A4E;color:#F3ECDC}
-.seat.nay{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
-.seat.tap{animation:stampTap .4s cubic-bezier(.3,1.7,.4,1) both}
-@keyframes stampTap{
-  0%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,162,69,0)}
-  32%{transform:scale(1.38);box-shadow:0 0 0 6px rgba(199,162,69,.28)}
-  62%{transform:scale(.92);box-shadow:0 0 0 2px rgba(199,162,69,.12)}
-  100%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,162,69,0)}
+.vote-row{display:flex;gap:10px;margin-top:16px}
+.vote-btn{
+  font-family:var(--cut);font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  padding:9px 20px;border-radius:1px;border:1px solid rgba(199,162,69,.4);background:transparent;
+  color:var(--ivory);transition:transform .15s,background .15s,border-color .15s;
 }
+.vote-btn:hover:not(:disabled){transform:translateY(-1px);border-color:var(--brass)}
+.vote-btn:disabled{opacity:.35;cursor:not-allowed}
+.vote-btn.yea.on{background:#5A7A4E;border-color:#5A7A4E;color:#F3ECDC}
+.vote-btn.nay.on{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
+.auth-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px;padding:14px 18px;
+  border:1px solid rgba(199,162,69,.28);border-radius:2px;background:rgba(199,162,69,.05)}
+.auth-box input[type=email]{flex:1 1 220px;background:rgba(0,0,0,.28);border:1px solid rgba(199,162,69,.28);
+  border-radius:1px;color:var(--ivory);font-family:var(--body);font-size:15px;padding:9px 12px}
+.auth-box input[type=email]::placeholder{color:rgba(183,172,150,.45);font-style:italic}
+.auth-box .who{font-size:14.5px;color:var(--ivory-dim)}
+.auth-box .who strong{color:var(--ivory);font-weight:500}
+.auth-msg{flex:1 1 100%;font-size:13.5px;color:var(--ivory-dim);font-style:italic}
+.auth-msg.err{color:#E2A99A}
 .meter{height:6px;background:rgba(255,255,255,.08);border-radius:8px;margin-top:14px;overflow:hidden;position:relative}
 .meter i{display:block;height:100%;background:#5A7A4E;transition:width .3s;position:relative;overflow:hidden}
 .meter i::after{
@@ -708,7 +714,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid rgba(199,162,69,.22
   font-family:var(--cut);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:rgba(183,172,150,.75);padding-left:.3em}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media print{body{background:#fff;color:#000}.filters,.btn-row,.seats,.case::before{display:none}}
+@media print{body{background:#fff;color:#000}.filters,.btn-row,.vote-row,.auth-box,.case::before{display:none}}
 
 /* ================= page shake + shared fx layer ================= */
 body.shake{animation:pageShake .42s ease}
@@ -1114,6 +1120,8 @@ body.shake{animation:pageShake .42s ease}
     <a class="btn" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
   </div>
 
+  <div class="auth-box" id="authBox"></div>
+
   <div class="floor-head">
     <span class="src" id="floorCount"></span>
   </div>
@@ -1146,6 +1154,7 @@ body.shake{animation:pageShake .42s ease}
 <footer>FF Murikuh · Commissioner's Office</footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
 "use strict";
@@ -1160,6 +1169,12 @@ body.shake{animation:pageShake .42s ease}
    boot                      — loads storage, kicks everything off
    ========================================== */
 var $=function(id){return document.getElementById(id)};
+
+/* ---------- voting backend (Supabase) ---------- */
+var SUPABASE_URL="https://vzxeucujtkkynocjkdqt.supabase.co";
+var SUPABASE_KEY="sb_publishable_XEgvp_Qh7Wr-gRQGz2HfMg_4tym7Vt2";
+var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+var session=null;
 
 /* ---------- storage ---------- */
 var mem={};
@@ -1176,7 +1191,7 @@ var store={
   }
 };
 
-var seasons=[], teams=12, votes={}, rules=[], floor=[], openIdx=-1, lastTap=null, justOpened=-1, prevStatus={}, floorEverRendered=false, draftPassed=false;
+var seasons=[], teams=12, voteCounts={}, myVotes={}, rules=[], floor=[], openIdx=-1, justOpened=-1, prevStatus={}, floorEverRendered=false, draftPassed=false;
 
 /* what is actually engraved on the base, newest first, plus one waiting plate */
 var ENGRAVED=[
@@ -1818,17 +1833,86 @@ var SEED_FLOOR=[
    why:"We never really decided what \u201Closer\u201D actually meant.",note:""}
 ];
 function threshold(){ return Math.floor(teams/2)+1 }
-function count(id,kind){ var v=votes[id]||{},n=0; for(var k in v) if(v[k]===kind) n++; return n; }
+function count(id,kind){ var c=voteCounts[id]; return c?(c[kind]||0):0; }
 function statusOf(p){
   var y=count(p.id,"yea"),n=count(p.id,"nay"),t=threshold();
   if(y>=t) return "passing";
   if(n>=t||(teams-n<t)) return "failing";
   return "open";
 }
-function saveFloor(){
-  store.set("ffm:floor",JSON.stringify(floor.filter(function(p){return p.src==="manual"})));
-}
 function nl2br(t){ return t.replace(/\n/g,"<br>") }
+/* ---------- login (magic link, invite-only) ---------- */
+function renderAuth(){
+  var box=$("authBox"); if(!box) return;
+  if(session){
+    box.innerHTML='<span class="who">Voting as <strong>'+esc(session.user.email)+'</strong></span>'+
+      '<button class="link" id="btnLogout" type="button">Log out</button>'+
+      '<span class="auth-msg" id="voteMsg"></span>';
+    $("btnLogout").addEventListener("click",function(){ sb.auth.signOut(); });
+    return;
+  }
+  box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
+    '<button class="btn" id="btnSendLink" type="button">Send login link</button>'+
+    '<span class="auth-msg" id="authMsg">Owners log in with a magic link to cast YEA/NAY votes.</span>';
+  var send=function(){
+    var email=$("authEmail").value.trim();
+    var msg=$("authMsg");
+    if(!email){ $("authEmail").focus(); return; }
+    msg.textContent="Sending…"; msg.className="auth-msg";
+    sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}})
+      .then(function(res){
+        if(res.error){
+          msg.textContent="That email isn't on the owner list yet — ask the commissioner to add it.";
+          msg.className="auth-msg err";
+          return;
+        }
+        msg.textContent="Check "+email+" for a login link.";
+      });
+  };
+  $("btnSendLink").addEventListener("click",send);
+  $("authEmail").addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
+}
+/* ---------- votes (Supabase) ---------- */
+function refreshVotes(){
+  var ids=floor.map(function(p){return p.id});
+  if(!ids.length){ voteCounts={}; myVotes={}; return Promise.resolve(); }
+  return sb.from("votes").select("proposal_id,user_id,choice").in("proposal_id",ids)
+    .then(function(res){
+      if(res.error){ console.error(res.error); return; }
+      voteCounts={}; myVotes={};
+      var uid=session&&session.user&&session.user.id;
+      (res.data||[]).forEach(function(r){
+        var c=voteCounts[r.proposal_id]||(voteCounts[r.proposal_id]={yea:0,nay:0});
+        c[r.choice]=(c[r.choice]||0)+1;
+        if(uid&&r.user_id===uid) myVotes[r.proposal_id]=r.choice;
+      });
+    });
+}
+function castVote(pid,choice){
+  if(!session) return;
+  var uid=session.user.id;
+  var op=myVotes[pid]===choice
+    ? sb.from("votes").delete().eq("proposal_id",pid).eq("user_id",uid)
+    : sb.from("votes").upsert({proposal_id:pid,user_id:uid,choice:choice},{onConflict:"proposal_id,user_id"});
+  op.then(function(res){
+    if(res.error){
+      var m=$("voteMsg");
+      if(m){ m.textContent=res.error.message; m.className="auth-msg err"; }
+      return;
+    }
+    refreshVotes().then(renderFloor);
+  });
+}
+function makeVoteBtn(pid,choice,label){
+  var b=document.createElement("button");
+  b.type="button";
+  b.className="vote-btn "+choice+(myVotes[pid]===choice?" on":"");
+  b.textContent=label;
+  b.disabled=!session;
+  b.title=session?"":"Log in above to vote";
+  b.addEventListener("click",function(){ castVote(pid,choice); });
+  return b;
+}
 function renderFloor(){
   var box=$("props");
   var wasRendered=floorEverRendered; floorEverRendered=true;
@@ -1852,50 +1936,20 @@ function renderFloor(){
     if(p.desc) html+='<p>'+nl2br(esc(p.desc))+'</p>';
     if(p.why) html+='<p class="why">'+nl2br(esc(p.why))+'</p>';
     if(p.note) html+='<p style="color:var(--ivory-dim);font-size:14.5px">'+esc(p.note)+'</p>';
-    html+='<div class="seats" role="group" aria-label="Owner votes"></div>'+
+    html+='<div class="vote-row" role="group" aria-label="Cast your vote"></div>'+
           '<div class="meter"><i style="width:'+Math.min(100,y/teams*100)+'%"></i><b style="left:'+(t/teams*100)+'%"></b></div>'+
           '<div class="tally">'+y+' yea · '+n+' nay — needs '+t+
           (p.src==="sheet"?' <span class="src">· from the form</span>':'')+'</div>';
     el.innerHTML=html;
-    var seats=el.querySelector(".seats");
-    for(var i=1;i<=teams;i++) seats.appendChild(makeSeat(p.id,i));
-    if(p.src==="manual"){
-      var rm=document.createElement("button");
-      rm.className="prop-strike"; rm.type="button"; rm.textContent="Withdraw";
-      rm.addEventListener("click",function(){
-        if(!confirm("Withdraw \u201C"+p.title+"\u201D?")) return;
-        floor=floor.filter(function(q){return q.id!==p.id});
-        delete votes[p.id];
-        store.set("ffm:votes",JSON.stringify(votes));
-        saveFloor(); renderFloor();
-      });
-      el.querySelector(".tally").appendChild(document.createTextNode(" "));
-      el.querySelector(".tally").appendChild(rm);
-    }
+    var voteRow=el.querySelector(".vote-row");
+    voteRow.appendChild(makeVoteBtn(p.id,"yea","YEA"));
+    voteRow.appendChild(makeVoteBtn(p.id,"nay","NAY"));
     box.appendChild(el);
     if(justPassed&&!REDUCE){
       var sr=el.querySelector(".stamp").getBoundingClientRect();
       spawnBurst(sr.left+sr.width/2,sr.top+sr.height/2,26);
     }
   });
-}
-function makeSeat(pid,num){
-  var cur=(votes[pid]||{})[num]||"none";
-  var b=document.createElement("button");
-  var justTapped=lastTap&&lastTap.pid===pid&&lastTap.num===num;
-  if(justTapped) lastTap=null;
-  b.className="seat"+(cur==="none"?"":" "+cur)+(justTapped?" tap":"");
-  b.textContent=num;
-  b.setAttribute("aria-label","Owner "+num+", currently "+(cur==="none"?"not voted":cur));
-  b.addEventListener("click",function(){
-    var order=["none","yea","nay"];
-    var v=votes[pid]||(votes[pid]={});
-    v[num]=order[(order.indexOf(v[num]||"none")+1)%3];
-    lastTap={pid:pid,num:num};
-    store.set("ffm:votes",JSON.stringify(votes));
-    renderFloor();
-  });
-  return b;
 }
 $("btnCopy").addEventListener("click",function(){
   if(!floor.length){ say("Nothing on the floor to tally.","err"); return; }
@@ -1962,9 +2016,9 @@ function ingest(text,label){
       why:(iWhy>-1?r[iWhy]:"")||"",
       note:(iNote>-1?r[iNote]:"")||""};
   });
-  floor=floor.filter(function(p){return p.src==="manual"}).concat(pulled);
+  floor=pulled;
   say(pulled.length+" submission"+(pulled.length===1?"":"s")+" pulled from "+label+".","ok");
-  renderFloor();
+  refreshVotes().then(renderFloor);
 }
 var SHEET_URL="https://docs.google.com/spreadsheets/d/1sLWaPBd9qINNJQFjwdMGvVnRs3ELafe5dctjqykBnpM/edit";
 function csvCandidates(url){
@@ -2021,27 +2075,31 @@ $("btnLoadPaste").addEventListener("click",function(){
 });
 
 /* ---------- boot ---------- */
-Promise.all([store.get("ffm:base"),store.get("ffm:votes"),store.get("ffm:teams"),
-             store.get("ffm:url"),store.get("ffm:rules"),store.get("ffm:floor")])
+sb.auth.onAuthStateChange(function(event,sess){
+  session=sess;
+  renderAuth();
+  refreshVotes().then(renderFloor);
+});
+Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),store.get("ffm:floor")])
 .then(function(v){
   var stored=null;
   try{ stored=v[0]?JSON.parse(v[0]):null; }catch(e){ stored=null; }
   seasons=merge(stored);
-  try{ votes=v[1]?JSON.parse(v[1]):{}; }catch(e){ votes={}; }
-  if(v[2]){ teams=parseInt(v[2],10)||12; }
-  try{ rules=v[4]?JSON.parse(v[4]):DEFAULT_RULES.slice(); }catch(e){ rules=DEFAULT_RULES.slice(); }
+  try{ rules=v[2]?JSON.parse(v[2]):DEFAULT_RULES.slice(); }catch(e){ rules=DEFAULT_RULES.slice(); }
   if(!Array.isArray(rules)) rules=DEFAULT_RULES.slice();
-  try{ floor=v[5]?JSON.parse(v[5]):[]; }catch(e){ floor=[]; }
+  try{ floor=v[3]?JSON.parse(v[3]):[]; }catch(e){ floor=[]; }
   if(!Array.isArray(floor)) floor=[];
   floor=floor.concat(SEED_FLOOR);
-  renderPlates(); renderRules(); renderFloor();
-  var url=new URLSearchParams(location.search).get("csv")||v[3]||SHEET_URL;
+  renderPlates(); renderRules(); renderAuth(); renderFloor();
+  refreshVotes().then(renderFloor);
+  var url=new URLSearchParams(location.search).get("csv")||v[1]||SHEET_URL;
   $("csvUrl").value=url;
   loadUrl(url,true);
 })
 .catch(function(){
   seasons=blankSeasons(); rules=DEFAULT_RULES.slice(); floor=SEED_FLOOR.slice();
-  renderPlates(); renderRules(); renderFloor();
+  renderPlates(); renderRules(); renderAuth(); renderFloor();
+  refreshVotes().then(renderFloor);
 });
 })();
 </script>
