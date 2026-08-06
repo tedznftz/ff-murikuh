@@ -611,6 +611,11 @@ input{font:inherit}
 .empty-note{color:var(--ivory-dim);font-style:italic;padding:8px 0 4px}
 
 /* ================= the floor ================= */
+.floor-rules{list-style:none;margin:0 0 20px;padding:14px 18px;border-left:2px solid rgba(199,162,69,.4);
+  background:rgba(199,162,69,.05);}
+.floor-rules li{font-size:14.5px;color:var(--ivory-dim);line-height:1.55}
+.floor-rules li+li{margin-top:6px}
+.floor-rules strong{color:var(--ivory);font-weight:500}
 .floor-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
 .link{
   background:transparent;border:0;padding:0;color:var(--brass);font-family:var(--cut);
@@ -1100,6 +1105,11 @@ body.shake{animation:pageShake .42s ease}
     <h2>On the Floor</h2>
     <p>Amendments up for a vote ahead of 2026-2027. A majority carries it.</p>
   </div>
+
+  <ul class="floor-rules">
+    <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
+    <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 22</strong>.</li>
+  </ul>
 
   <div class="btn-row">
     <a class="btn" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
