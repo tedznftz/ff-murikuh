@@ -686,7 +686,6 @@ input{font:inherit}
 .seat:hover{transform:scale(1.1);border-color:var(--brass)}
 .seat.yea{background:#5A7A4E;border-color:#5A7A4E;color:#F3ECDC}
 .seat.nay{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
-.seat.abstain{background:#8B8069;border-color:#8B8069;color:#F3ECDC}
 .seat.tap{animation:stampTap .4s cubic-bezier(.3,1.7,.4,1) both}
 @keyframes stampTap{
   0%{transform:scale(1);box-shadow:0 0 0 0 rgba(199,162,69,0)}
@@ -1841,7 +1840,7 @@ function renderFloor(){
   }
   box.innerHTML="";
   floor.forEach(function(p){
-    var st=statusOf(p),y=count(p.id,"yea"),n=count(p.id,"nay"),a=count(p.id,"abstain"),t=threshold();
+    var st=statusOf(p),y=count(p.id,"yea"),n=count(p.id,"nay"),t=threshold();
     var justPassed=wasRendered&&st==="passing"&&prevStatus[p.id]!=="passing";
     prevStatus[p.id]=st;
     var el=document.createElement("article");
@@ -1855,7 +1854,7 @@ function renderFloor(){
     if(p.note) html+='<p style="color:var(--ivory-dim);font-size:14.5px">'+esc(p.note)+'</p>';
     html+='<div class="seats" role="group" aria-label="Owner votes"></div>'+
           '<div class="meter"><i style="width:'+Math.min(100,y/teams*100)+'%"></i><b style="left:'+(t/teams*100)+'%"></b></div>'+
-          '<div class="tally">'+y+' yea · '+n+' nay · '+a+' abstain — needs '+t+
+          '<div class="tally">'+y+' yea · '+n+' nay — needs '+t+
           (p.src==="sheet"?' <span class="src">· from the form</span>':'')+'</div>';
     el.innerHTML=html;
     var seats=el.querySelector(".seats");
@@ -1889,9 +1888,9 @@ function makeSeat(pid,num){
   b.textContent=num;
   b.setAttribute("aria-label","Owner "+num+", currently "+(cur==="none"?"not voted":cur));
   b.addEventListener("click",function(){
-    var order=["none","yea","nay","abstain"];
+    var order=["none","yea","nay"];
     var v=votes[pid]||(votes[pid]={});
-    v[num]=order[(order.indexOf(v[num]||"none")+1)%4];
+    v[num]=order[(order.indexOf(v[num]||"none")+1)%3];
     lastTap={pid:pid,num:num};
     store.set("ffm:votes",JSON.stringify(votes));
     renderFloor();
@@ -1904,7 +1903,7 @@ $("btnCopy").addEventListener("click",function(){
   floor.forEach(function(p){
     var st=statusOf(p);
     lines.push((st==="passing"?"[CARRIED] ":st==="failing"?"[DOWN] ":"[OPEN] ")+p.title+" \u2014 "+p.owner);
-    lines.push("   "+count(p.id,"yea")+"Y / "+count(p.id,"nay")+"N / "+count(p.id,"abstain")+"A");
+    lines.push("   "+count(p.id,"yea")+"Y / "+count(p.id,"nay")+"N");
   });
   var txt=lines.join("\n");
   if(navigator.clipboard&&navigator.clipboard.writeText){
