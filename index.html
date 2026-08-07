@@ -1661,14 +1661,15 @@ var armPlates=(function(){
       plate.position.set(0,riser.position.y-0.06,0.52);
       group.add(plate);
 
-      /* small gold tapered stem connecting the riser to the ring */
-      var stem=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,0.22,20),gold);
-      stem.position.set(0,riserTop+0.11,0);
-      group.add(stem);
+      /* short black socket the ball's base actually plugs into, part of the stand */
+      var socket=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.24,0.34,20),riserMat);
+      socket.position.set(0,riserTop+0.17,0);
+      group.add(socket);
+      var socketTop=socket.position.y+0.17;
 
-      /* gold collar ring, right where the ball rests */
-      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.46,0.1,16,48),gold);
-      ring.rotation.x=Math.PI/2; ring.position.set(0,riserTop+0.31,0);
+      /* thin gold collar ring, wrapped right at the ball/socket seam */
+      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.06,16,48),gold);
+      ring.rotation.x=Math.PI/2; ring.position.set(0,socketTop,0);
       group.add(ring);
 
       /* column + plates: 6 on the front, 5 on the right, back/left stay blank */
