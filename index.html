@@ -81,11 +81,33 @@ input{font:inherit}
 }
 .flash.go{animation:flashPop .55s ease-out}
 @keyframes flashPop{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
-.confetti{position:absolute;top:30%;left:50%;width:6px;height:11px;border-radius:1px;
-  animation:confettiFall 1.2s cubic-bezier(.25,.55,.4,1) forwards}
+.confetti{position:absolute;width:6px;height:11px;border-radius:1px;
+  animation:confettiFall var(--cfdur,1.3s) cubic-bezier(.25,.55,.4,1) forwards}
+.confetti.round{border-radius:50%}
 @keyframes confettiFall{
-  0%{transform:translate(-50%,0) rotate(0deg);opacity:1}
-  100%{transform:translate(calc(-50% + var(--dx,0px)),300px) rotate(var(--rot,360deg));opacity:0}
+  0%{transform:translate(-50%,-50%) rotate(0deg);opacity:1}
+  45%{transform:translate(calc(-50% + var(--dx,0px) * .4),calc(-50% + var(--fall,300px) * .4)) rotate(calc(var(--rot,360deg) * .55))}
+  100%{transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--fall,300px))) rotate(var(--rot,360deg));opacity:0}
+}
+.shockwave{
+  position:absolute;width:14px;height:14px;border-radius:50%;margin:-7px 0 0 -7px;
+  border:2px solid rgba(246,228,176,.9);box-shadow:0 0 14px 2px rgba(246,228,176,.4);
+  animation:shockwaveOut .65s cubic-bezier(.15,.6,.3,1) forwards;
+}
+@keyframes shockwaveOut{
+  0%{transform:scale(1);opacity:.9;border-width:3px}
+  100%{transform:scale(13);opacity:0;border-width:1px}
+}
+.spark{
+  position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;
+  background:radial-gradient(circle,#FFFBEF 0%,#F6E4B0 40%,transparent 72%);
+  mix-blend-mode:screen;
+  animation:sparkPop .8s ease-out forwards;
+}
+@keyframes sparkPop{
+  0%{transform:translate(0,0) scale(0);opacity:0}
+  22%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{transform:translate(var(--sdx,0px),var(--sdy,0px)) scale(0);opacity:0}
 }
 .mote{position:absolute;bottom:8%;width:3px;height:3px;border-radius:50%;opacity:0;
   background:#F6E4B0;box-shadow:0 0 6px 2px rgba(246,228,176,.55);
@@ -1631,27 +1653,55 @@ var triggerJumpscare=(function(){
   var shot=$("shot"),fx=$("fx"),flash=$("flash"); if(!shot||!fx) return;
   var colors=["#F6E4B0","#C7A245","#EFE7D6","#E8D9AE","#7C5F1D"];
   var tapCount=0;
-  shot.addEventListener("click",function(){
+  shot.addEventListener("click",function(e){
     if(REDUCE) return;
     tapCount++;
     if(Math.random()<0.14){
       triggerJumpscare();
       return;
     }
+    var fr=fx.getBoundingClientRect();
+    var originLeft=((e.clientX-fr.left)/fr.width*100), originTop=((e.clientY-fr.top)/fr.height*100);
+    originLeft=Math.max(8,Math.min(92,originLeft));
+    originTop=Math.max(6,Math.min(90,originTop));
+
     flash.classList.remove("go"); void flash.offsetWidth; flash.classList.add("go");
     shot.classList.remove("pop"); void shot.offsetWidth; shot.classList.add("pop");
-    var pieces=22+Math.min(tapCount,6)*6;
+
+    var wave=document.createElement("span");
+    wave.className="shockwave";
+    wave.style.left=originLeft+"%"; wave.style.top=originTop+"%";
+    fx.appendChild(wave);
+    setTimeout(function(){ wave.remove() },700);
+
+    var sparks=7+Math.min(tapCount,5)*2;
+    for(var s=0;s<sparks;s++){
+      var sp=document.createElement("span");
+      sp.className="spark";
+      sp.style.left=originLeft+"%"; sp.style.top=originTop+"%";
+      var sang=Math.random()*Math.PI*2, sdist=26+Math.random()*84;
+      sp.style.setProperty("--sdx",(Math.cos(sang)*sdist).toFixed(0)+"px");
+      sp.style.setProperty("--sdy",(Math.sin(sang)*sdist).toFixed(0)+"px");
+      sp.style.animationDelay=(Math.random()*.1).toFixed(2)+"s";
+      fx.appendChild(sp);
+      (function(el){ setTimeout(function(){ el.remove() },950); })(sp);
+    }
+
+    var pieces=26+Math.min(tapCount,6)*7;
     for(var i=0;i<pieces;i++){
       var c=document.createElement("span");
-      c.className="confetti";
-      c.style.setProperty("--dx",(Math.random()*280-140).toFixed(0)+"px");
-      c.style.setProperty("--rot",(Math.random()*640-320).toFixed(0)+"deg");
-      c.style.left=(36+Math.random()*28)+"%";
-      c.style.top=(24+Math.random()*10)+"%";
+      c.className="confetti"+(Math.random()<0.4?" round":"");
+      var size=5+Math.random()*5;
+      c.style.width=size+"px"; c.style.height=(Math.random()<0.4?size:size*1.8)+"px";
+      c.style.setProperty("--dx",(Math.random()*340-170).toFixed(0)+"px");
+      c.style.setProperty("--fall",(230+Math.random()*220).toFixed(0)+"px");
+      c.style.setProperty("--rot",(Math.random()*760-380).toFixed(0)+"deg");
+      c.style.setProperty("--cfdur",(1.05+Math.random()*.55).toFixed(2)+"s");
+      c.style.left=originLeft+"%"; c.style.top=originTop+"%";
       c.style.background=colors[i%colors.length];
-      c.style.animationDelay=(Math.random()*.14).toFixed(2)+"s";
+      c.style.animationDelay=(Math.random()*.16).toFixed(2)+"s";
       fx.appendChild(c);
-      (function(el){ setTimeout(function(){ el.remove() },1500); })(c);
+      (function(el){ setTimeout(function(){ el.remove() },1700); })(c);
     }
     if(tapCount>=5){
       document.body.classList.remove("shake"); void document.body.offsetWidth; document.body.classList.add("shake");
