@@ -10,13 +10,16 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="description" content="Every season since 2015. Champions, standing rules, and amendments up for a vote — the FF Murikuh league trophy, digitized.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://murikuh.xyz/">
 <meta property="og:title" content="FF Murikuh — The Trophy">
 <meta property="og:description" content="Every season since 2015. Champions, standing rules, and amendments up for a vote.">
-<!-- og:image needs a real hosted URL once this page is live — a data URI here won't render in link previews -->
-<!-- <meta property="og:image" content="https://your-domain.example/trophy-preview.jpg"> -->
+<meta property="og:image" content="https://murikuh.xyz/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FF Murikuh — The Trophy">
 <meta name="twitter:description" content="Every season since 2015. Champions, standing rules, and amendments up for a vote.">
+<meta name="twitter:image" content="https://murikuh.xyz/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2080,6 +2083,22 @@ function renderFloor(){
     var voteRow=el.querySelector(".vote-row");
     voteRow.appendChild(makeVoteBtn(p.id,"yea","YEA"));
     voteRow.appendChild(makeVoteBtn(p.id,"nay","NAY"));
+    if(ADMIN&&st==="passing"){
+      var already=p.promoted||rules.some(function(r){return r.t===p.title});
+      var promoteBtn=document.createElement("button");
+      promoteBtn.className="btn"; promoteBtn.type="button";
+      promoteBtn.textContent=already?"Added to Commandments":"Add to the Commandments";
+      promoteBtn.disabled=already;
+      promoteBtn.addEventListener("click",function(){
+        rules.push({t:p.title,b:p.desc||p.why||""});
+        p.promoted=true;
+        saveRules(); renderRules(); renderFloor();
+      });
+      var promoteRow=document.createElement("div");
+      promoteRow.className="btn-row"; promoteRow.style.marginTop="12px";
+      promoteRow.appendChild(promoteBtn);
+      el.appendChild(promoteRow);
+    }
     box.appendChild(el);
     if(justPassed&&!REDUCE){
       var sr=el.querySelector(".stamp").getBoundingClientRect();
@@ -2211,7 +2230,8 @@ $("btnLoadPaste").addEventListener("click",function(){
 });
 
 /* ---------- boot ---------- */
-if(new URLSearchParams(location.search).get("admin")==="1"){ $("adminPanel").hidden=false; }
+var ADMIN=new URLSearchParams(location.search).get("admin")==="1";
+if(ADMIN){ $("adminPanel").hidden=false; }
 sb.auth.onAuthStateChange(function(event,sess){
   session=sess;
   renderAuth();
