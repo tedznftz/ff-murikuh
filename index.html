@@ -1455,8 +1455,7 @@ try{ REDUCE=window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catc
 
 (function descent(){
   if(REDUCE) return;
-  var d=$("descent"), cs=document.querySelector(".case"), ped=document.querySelector(".pedestal"),
-      turn=$("turn");
+  var d=$("descent"), cs=document.querySelector(".case"), ped=document.querySelector(".pedestal");
   if(!d||!cs||!ped) return;
   var ticking=false;
   function clamp(n){ return n<0?0:n>1?1:n }
@@ -1466,7 +1465,6 @@ try{ REDUCE=window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catc
     d.style.setProperty("--p",p.toFixed(3));
     var lift=clamp(window.pageYOffset/Math.max(1,cs.offsetHeight*0.9));
     ped.style.transform="translateY("+(-lift*30).toFixed(1)+"px)";
-    if(turn) turn.style.setProperty("--spin",(lift*360).toFixed(1)+"deg");
     cs.style.setProperty("--dim",(1-lift*0.8).toFixed(3));
   }
   window.addEventListener("scroll",function(){
@@ -1475,6 +1473,21 @@ try{ REDUCE=window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catc
   },{passive:true});
   window.addEventListener("resize",update,{passive:true});
   update();
+})();
+
+/* ---------- the trophy turns slowly on its own, always ---------- */
+(function spinTrophy(){
+  if(REDUCE) return;
+  var turn=$("turn"); if(!turn) return;
+  var PERIOD=32000;
+  function frame(ts){
+    if(document.visibilityState==="visible"){
+      var deg=(ts%PERIOD)/PERIOD*360;
+      turn.style.setProperty("--spin",deg.toFixed(2)+"deg");
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 
 /* ---------- plates fasten on as they arrive ---------- */
