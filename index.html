@@ -1650,22 +1650,37 @@ var armPlates=(function(){
       plateBack.position.set(0,1.05,-0.04);
       group.add(plateBack);
 
-      /* column + plates */
-      var column=new THREE.Mesh(new THREE.BoxGeometry(2.05,3.5,0.62),wood);
+      /* column + plates: 6 on the front, 5 on the right, back/left stay blank */
+      var colW=2.05,colH=3.5,colD=1.5;
+      var column=new THREE.Mesh(new THREE.BoxGeometry(colW,colH,colD),wood);
       column.position.set(0,-1.35,0);
       group.add(column);
-      for(var pi=0;pi<4;pi++){
-        var py=-0.15-pi*0.72;
-        var cp=new THREE.Mesh(new THREE.BoxGeometry(1.4,0.58,0.06),colPlateMat);
-        cp.position.set(0,py,0.34);
-        group.add(cp);
+
+      var colTop=column.position.y+colH/2, colBottom=column.position.y-colH/2;
+      var margin=0.25, usableTop=colTop-margin, usableBottom=colBottom+margin;
+      var usableH=usableTop-usableBottom;
+
+      function plateY(i,n){ var slot=usableH/n; return usableBottom+slot*(i+0.5); }
+
+      var frontN=6, frontSlot=usableH/frontN, frontPlateH=frontSlot*0.8;
+      for(var fi=0;fi<frontN;fi++){
+        var fp=new THREE.Mesh(new THREE.BoxGeometry(1.4,frontPlateH,0.06),colPlateMat);
+        fp.position.set(0,plateY(fi,frontN),colD/2+0.03);
+        group.add(fp);
       }
 
-      /* base */
-      var baseCap=new THREE.Mesh(new THREE.BoxGeometry(2.3,0.35,0.85),wood);
+      var rightN=5, rightSlot=usableH/rightN, rightPlateH=rightSlot*0.8;
+      for(var ri=0;ri<rightN;ri++){
+        var rp=new THREE.Mesh(new THREE.BoxGeometry(0.06,rightPlateH,1.0),colPlateMat);
+        rp.position.set(colW/2+0.03,plateY(ri,rightN),0);
+        group.add(rp);
+      }
+
+      /* base — square footprint so every side reads the same size */
+      var baseCap=new THREE.Mesh(new THREE.BoxGeometry(2.3,0.35,2.3),wood);
       baseCap.position.set(0,-3.25,0);
       group.add(baseCap);
-      var baseFoot=new THREE.Mesh(new THREE.BoxGeometry(2.55,0.45,1.0),wood);
+      var baseFoot=new THREE.Mesh(new THREE.BoxGeometry(2.55,0.45,2.55),wood);
       baseFoot.position.set(0,-3.62,0);
       group.add(baseFoot);
 
