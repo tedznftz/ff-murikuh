@@ -1680,19 +1680,20 @@ var armPlates=(function(){
       var margin=0.25, usableTop=colTop-margin, usableBottom=colBottom+margin;
       var usableH=usableTop-usableBottom;
 
-      function plateY(i,n){ var slot=usableH/n; return usableBottom+slot*(i+0.5); }
+      /* one shared grid of 6 slots (bottom to top) — front fills all 6, the right
+         side uses the same size/spacing but is just missing its top plaque */
+      var slots=6, slotH=usableH/slots, plateH=slotH*0.8;
+      function plateY(i){ return usableBottom+slotH*(i+0.5); }
 
-      var frontN=6, frontSlot=usableH/frontN, frontPlateH=frontSlot*0.8;
-      for(var fi=0;fi<frontN;fi++){
-        var fp=new THREE.Mesh(new THREE.BoxGeometry(1.4,frontPlateH,0.06),colPlateMat);
-        fp.position.set(0,plateY(fi,frontN),colD/2+0.03);
+      for(var fi=0;fi<slots;fi++){
+        var fp=new THREE.Mesh(new THREE.BoxGeometry(1.4,plateH,0.06),colPlateMat);
+        fp.position.set(0,plateY(fi),colD/2+0.03);
         group.add(fp);
       }
 
-      var rightN=5, rightSlot=usableH/rightN, rightPlateH=rightSlot*0.8;
-      for(var ri=0;ri<rightN;ri++){
-        var rp=new THREE.Mesh(new THREE.BoxGeometry(0.06,rightPlateH,1.0),colPlateMat);
-        rp.position.set(colW/2+0.03,plateY(ri,rightN),0);
+      for(var ri=0;ri<slots-1;ri++){
+        var rp=new THREE.Mesh(new THREE.BoxGeometry(0.06,plateH,1.0),colPlateMat);
+        rp.position.set(colW/2+0.03,plateY(ri),0);
         group.add(rp);
       }
 
