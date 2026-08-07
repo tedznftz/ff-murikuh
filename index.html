@@ -1245,6 +1245,12 @@ var SUPABASE_URL="https://vzxeucujtkkynocjkdqt.supabase.co";
 var SUPABASE_KEY="sb_publishable_XEgvp_Qh7Wr-gRQGz2HfMg_4tym7Vt2";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 var session=null;
+/* commissioner-only tools (admin panel, promote-to-commandment) unlock for these logged-in emails */
+var ADMIN_EMAILS=["tv00151@gmail.com"];
+var ADMIN=false;
+function computeAdmin(){
+  return !!(session&&session.user&&session.user.email&&ADMIN_EMAILS.indexOf(session.user.email)>-1);
+}
 
 /* ---------- storage ---------- */
 var mem={};
@@ -2230,10 +2236,10 @@ $("btnLoadPaste").addEventListener("click",function(){
 });
 
 /* ---------- boot ---------- */
-var ADMIN=new URLSearchParams(location.search).get("admin")==="1";
-if(ADMIN){ $("adminPanel").hidden=false; }
 sb.auth.onAuthStateChange(function(event,sess){
   session=sess;
+  ADMIN=computeAdmin();
+  $("adminPanel").hidden=!ADMIN;
   renderAuth();
   refreshVotes().then(renderFloor);
 });
@@ -2247,6 +2253,8 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   try{ floor=v[3]?JSON.parse(v[3]):[]; }catch(e){ floor=[]; }
   if(!Array.isArray(floor)) floor=[];
   floor=floor.concat(SEED_FLOOR);
+  ADMIN=computeAdmin();
+  $("adminPanel").hidden=!ADMIN;
   renderPlates(); renderRules(); renderAuth(); renderFloor();
   refreshVotes().then(renderFloor);
   var url=new URLSearchParams(location.search).get("csv")||v[1]||SHEET_URL;
@@ -2255,6 +2263,8 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
 })
 .catch(function(){
   seasons=blankSeasons(); rules=DEFAULT_RULES.slice(); floor=SEED_FLOOR.slice();
+  ADMIN=computeAdmin();
+  $("adminPanel").hidden=!ADMIN;
   renderPlates(); renderRules(); renderAuth(); renderFloor();
   refreshVotes().then(renderFloor);
 });
