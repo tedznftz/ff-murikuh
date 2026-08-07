@@ -1633,14 +1633,21 @@ var armPlates=(function(){
       group.add(woodCap);
 
       /* black riser — a real frustum, wide at the base, sharply narrowing toward the top */
-      var riserH=0.78;
-      var riser=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.72,riserH,4),riserMat);
+      var riserH=0.78, riserTopR=0.24, riserBottomR=0.72;
+      var riser=new THREE.Mesh(new THREE.CylinderGeometry(riserTopR,riserBottomR,riserH,4),riserMat);
       riser.rotation.y=Math.PI/4;
       riser.position.set(0,0.48+0.08+riserH/2,0);
       group.add(riser);
       var riserTop=riser.position.y+riserH/2;
 
-      /* nameplate, with the actual text baked onto a canvas texture, filling most of the riser's front face */
+      /* nameplate, mounted flush against the riser's sloped front face — not floating flat in front of it */
+      var faceSlope=Math.atan2(
+        (riserBottomR-riserTopR)*Math.cos(Math.PI/4),
+        riserH
+      );
+      var plateLocalY=-0.06;
+      var apothemAtPlate=(riserBottomR+(riserTopR-riserBottomR)*(plateLocalY+riserH/2)/riserH)*Math.cos(Math.PI/4);
+
       var pc=document.createElement("canvas"); pc.width=512; pc.height=340;
       var pctx=pc.getContext("2d");
       function drawPlate(font){
@@ -1658,7 +1665,8 @@ var armPlates=(function(){
       plateTex.colorSpace=THREE.SRGBColorSpace;
       var plate=new THREE.Mesh(new THREE.BoxGeometry(0.92,0.62,0.06),
         new THREE.MeshStandardMaterial({map:plateTex,metalness:0.4,roughness:0.4}));
-      plate.position.set(0,riser.position.y-0.06,0.52);
+      plate.position.set(0,riser.position.y+plateLocalY,apothemAtPlate+0.05);
+      plate.rotation.x=-faceSlope;
       group.add(plate);
 
       /* short black socket the ball's base actually plugs into, part of the stand */
