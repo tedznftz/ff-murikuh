@@ -147,7 +147,7 @@ input{font:inherit}
   font-size:clamp(23px,5.4vw,42px);line-height:1.15;color:#E8D9AE;
   text-shadow:0 1px 0 rgba(255,255,255,.18),0 -1px 2px rgba(0,0,0,.7);
 }
-.dedication .rule{width:64px;height:1px;background:var(--brass);margin:16px auto;opacity:.7}
+.dedication .divider{width:64px;height:1px;background:var(--brass);margin:16px auto;opacity:.7}
 .dedication p{margin:0;font-size:16px;color:var(--ivory-dim);font-style:italic}
 .dedication .held{color:#E8D9AE;font-style:normal}
 
@@ -668,7 +668,8 @@ input{font:inherit}
   box-shadow:0 14px 28px rgba(0,0,0,.42)}
 .prop.passing{border-left-color:#6FA25E}
 .prop.failing{border-left-color:#B2544A}
-.prop-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.prop-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.prop-top>div{min-width:0}
 .prop h3{font-family:var(--cut);font-weight:600;font-size:18px;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;color:#EDE7D6}
 .by{font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brass);margin-top:5px}
 .prop p{margin:11px 0 0;font-size:15.5px;white-space:pre-line;color:#CFC6B1}
@@ -963,7 +964,7 @@ body.shake{animation:pageShake .42s ease}
 
   <div class="dedication">
     <h1>The FF Murikuh<br>League Champion Trophy</h1>
-    <div class="rule"></div>
+    <div class="divider"></div>
     <p>Held by <span class="held" id="holder">nobody</span></p>
   </div>
 </header>
