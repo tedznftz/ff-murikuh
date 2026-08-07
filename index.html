@@ -760,6 +760,28 @@ body.shake{animation:pageShake .42s ease}
   0%{transform:translate(0,0) rotate(0deg);opacity:1}
   100%{transform:translate(var(--gdx,0px),230px) rotate(var(--grot,320deg));opacity:0}
 }
+.flyby{
+  position:absolute;left:0;font-size:32px;line-height:1;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));
+  animation:flybyArc var(--fbdur,2.6s) linear forwards;
+  will-change:transform,opacity;
+}
+@keyframes flybyArc{
+  0%{transform:translate(-10vw,0) rotate(0deg);opacity:0}
+  8%{opacity:1}
+  50%{transform:translate(50vw,var(--fbdip,-70px)) rotate(var(--fbrot1,520deg))}
+  92%{opacity:1}
+  100%{transform:translate(110vw,0) rotate(var(--fbrot2,900deg));opacity:0}
+}
+.vote-toss{
+  position:fixed;font-size:20px;line-height:1;pointer-events:none;z-index:9999;
+  animation:voteTossPop .9s cubic-bezier(.2,1.6,.3,1) forwards;
+}
+@keyframes voteTossPop{
+  0%{transform:translate(-50%,-50%) scale(.4) rotate(0deg);opacity:0}
+  30%{opacity:1;transform:translate(-50%,-150%) scale(1.15) rotate(160deg)}
+  100%{transform:translate(-50%,-230%) scale(.7) rotate(380deg);opacity:0}
+}
 </style>
 </head>
 <body>
@@ -1519,6 +1541,41 @@ function spawnBurst(x,y,count,colors){
   },{passive:true});
 })();
 
+/* ---------- a football sails across the screen every so often, for no reason ---------- */
+(function flybyFootballs(){
+  if(REDUCE) return;
+  function spawn(){
+    if(document.visibilityState!=="visible") return;
+    var el=document.createElement("span");
+    el.className="flyby";
+    el.textContent="🏈";
+    el.style.top=(8+Math.random()*74)+"vh";
+    el.style.setProperty("--fbdip",(-40-Math.random()*100).toFixed(0)+"px");
+    el.style.setProperty("--fbrot1",(360+Math.random()*540).toFixed(0)+"deg");
+    el.style.setProperty("--fbrot2",(720+Math.random()*720).toFixed(0)+"deg");
+    var dur=(2.4+Math.random()*1.6);
+    el.style.setProperty("--fbdur",dur.toFixed(2)+"s");
+    gLayer.appendChild(el);
+    setTimeout(function(){ el.remove(); },dur*1000+200);
+  }
+  function scheduleNext(){
+    var delay=28000+Math.random()*37000;
+    setTimeout(function(){ spawn(); scheduleNext(); },delay);
+  }
+  scheduleNext();
+})();
+function voteToss(el){
+  if(REDUCE||!el) return;
+  var r=el.getBoundingClientRect();
+  var s=document.createElement("span");
+  s.className="vote-toss";
+  s.textContent="🏈";
+  s.style.left=(r.left+r.width/2)+"px";
+  s.style.top=r.top+"px";
+  gLayer.appendChild(s);
+  setTimeout(function(){ s.remove(); },950);
+}
+
 /* ---------- here's johnny ---------- */
 var triggerJumpscare=(function(){
   var jc=$("jumpscare"),img=$("jumpscareImg"); if(!jc||!img) return function(){};
@@ -1936,7 +1993,10 @@ function makeVoteBtn(pid,choice,label){
   b.textContent=label;
   b.disabled=!session;
   b.title=session?"":"Log in above to vote";
-  b.addEventListener("click",function(){ castVote(pid,choice); });
+  b.addEventListener("click",function(){
+    if(myVotes[pid]!==choice) voteToss(b);
+    castVote(pid,choice);
+  });
   return b;
 }
 function renderFloor(){
