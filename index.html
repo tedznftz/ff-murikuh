@@ -1590,14 +1590,29 @@ var armPlates=(function(){
       var laceMat=new THREE.MeshStandardMaterial({color:0xF3ECDC,metalness:0.1,roughness:0.6});
       var seamMat=new THREE.MeshStandardMaterial({color:0x5B4312,metalness:0.6,roughness:0.5});
       var colPlateMat=new THREE.MeshStandardMaterial({color:0xC7A245,metalness:0.75,roughness:0.4});
+      var riserMat=new THREE.MeshStandardMaterial({color:0x0C0C0C,metalness:0.25,roughness:0.28});
 
       var group=new THREE.Group();
 
-      /* football */
+      /* football — pebbled leather texture via a bump map, not just flat gold */
+      var pebbleCanvas=document.createElement("canvas"); pebbleCanvas.width=256; pebbleCanvas.height=256;
+      var pctx0=pebbleCanvas.getContext("2d");
+      pctx0.fillStyle="#808080"; pctx0.fillRect(0,0,256,256);
+      for(var pb=0;pb<1100;pb++){
+        var px0=Math.random()*256,py0=Math.random()*256,pr0=0.7+Math.random()*1.4;
+        var shade=Math.random()<0.5?30:225;
+        pctx0.fillStyle="rgba("+shade+","+shade+","+shade+","+(0.3+Math.random()*0.35)+")";
+        pctx0.beginPath(); pctx0.arc(px0,py0,pr0,0,Math.PI*2); pctx0.fill();
+      }
+      var pebbleTex=new THREE.CanvasTexture(pebbleCanvas);
+      pebbleTex.wrapS=pebbleTex.wrapT=THREE.RepeatWrapping;
+      pebbleTex.repeat.set(6,10);
+      var ballMat=new THREE.MeshStandardMaterial({color:0xC7A245,metalness:0.55,roughness:0.6,bumpMap:pebbleTex,bumpScale:0.02});
+
       var ballGroup=new THREE.Group();
       var prof=[[0,-1.3],[0.22,-1.05],[0.42,-0.7],[0.56,-0.35],[0.62,0],[0.56,0.35],[0.42,0.7],[0.22,1.05],[0,1.3]];
       var pts=prof.map(function(p){ return new THREE.Vector2(p[0],p[1]); });
-      var ball=new THREE.Mesh(new THREE.LatheGeometry(pts,48),gold);
+      var ball=new THREE.Mesh(new THREE.LatheGeometry(pts,48),ballMat);
       ballGroup.add(ball);
       for(var i=0;i<5;i++){
         var ly=(i-2)*0.28;
@@ -1609,18 +1624,21 @@ var armPlates=(function(){
       seam.position.set(0,0,0.64);
       ballGroup.add(seam);
       ballGroup.rotation.z=THREE.MathUtils.degToRad(-19);
-      ballGroup.position.set(0,2.5,0);
+      ballGroup.position.set(0,2.35,0);
       group.add(ballGroup);
 
-      /* ring + connector */
-      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.85,0.14,16,48),gold);
-      ring.rotation.x=Math.PI/2; ring.position.set(0,1.55,0);
+      /* gold collar ring, sitting right on top of the black riser */
+      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.46,0.1,16,48),gold);
+      ring.rotation.x=Math.PI/2; ring.position.set(0,1.48,0);
       group.add(ring);
-      var connector=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.32,0.18,24),dark);
-      connector.position.set(0,1.4,0);
-      group.add(connector);
 
-      /* nameplate, with the actual text baked onto a canvas texture */
+      /* black tapered riser — a 4-sided frustum, not a round cylinder, so it has flat faces */
+      var riser=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.64,0.85,4),riserMat);
+      riser.rotation.y=Math.PI/4;
+      riser.position.set(0,1.0,0);
+      group.add(riser);
+
+      /* nameplate, with the actual text baked onto a canvas texture, mounted on the riser's front face */
       var pc=document.createElement("canvas"); pc.width=512; pc.height=220;
       var pctx=pc.getContext("2d");
       function drawPlate(font){
@@ -1642,13 +1660,15 @@ var armPlates=(function(){
           plateTex.needsUpdate=true;
         }).catch(function(){});
       }catch(e){}
-      var plate=new THREE.Mesh(new THREE.BoxGeometry(1.55,0.68,0.12),
+      var plate=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.5,0.08),
         new THREE.MeshStandardMaterial({map:plateTex,metalness:0.5,roughness:0.45}));
-      plate.position.set(0,1.05,0);
+      plate.position.set(0,1.0,0.42);
       group.add(plate);
-      var plateBack=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.85,0.1),dark);
-      plateBack.position.set(0,1.05,-0.04);
-      group.add(plateBack);
+
+      /* wood shelf cap under the riser, before the column starts */
+      var woodCap=new THREE.Mesh(new THREE.BoxGeometry(2.3,0.16,1.7),wood);
+      woodCap.position.set(0,0.48,0);
+      group.add(woodCap);
 
       /* column + plates: 6 on the front, 5 on the right, back/left stay blank */
       var colW=2.05,colH=3.5,colD=1.5;
