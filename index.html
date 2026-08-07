@@ -545,7 +545,6 @@ input{font:inherit}
   50%{filter:brightness(1.22) drop-shadow(0 0 5px rgba(246,228,176,.5))}
 }
 .pip-extra{margin-left:2px;font-family:var(--ui);font-weight:600;font-size:15px}
-.roll .n{font-size:13px;color:var(--ivory-dim);flex:0 0 auto;font-variant-numeric:tabular-nums}
 .roll .none{color:var(--ivory-dim);font-style:italic;font-size:15px;border:0}
 .cellar{margin-top:16px;padding-top:14px;border-top:1px solid rgba(199,162,69,.24)}
 .cellar-empty{font-size:14px;color:var(--ivory-dim);font-style:italic}
@@ -1369,8 +1368,7 @@ function renderRoll(){
       var shown=Math.min(tally[nm],6), pips="";
       for(i=0;i<shown;i++) pips+='<svg class="pip-trophy trophy-icon" viewBox="0 0 200 420" aria-hidden="true"><use href="#miniTrophy"></use></svg>';
       if(tally[nm]>6) pips+='<span class="pip-extra">\u00D7</span>';
-      li.innerHTML='<span class="nm">'+esc(nm)+'</span><span class="pips">'+pips+'</span>'+
-                   '<span class="n">'+tally[nm]+'</span>';
+      li.innerHTML='<span class="nm">'+esc(nm)+'</span><span class="pips">'+pips+'</span>';
       ul.appendChild(li);
     });
   }
