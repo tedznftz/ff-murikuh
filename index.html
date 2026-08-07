@@ -1623,52 +1623,53 @@ var armPlates=(function(){
       var seam=new THREE.Mesh(new THREE.BoxGeometry(0.035,1.2,0.03),seamMat);
       seam.position.set(0,0,0.68);
       ballGroup.add(seam);
-      ballGroup.rotation.z=THREE.MathUtils.degToRad(-19);
-      ballGroup.position.set(0,1.95,0);
+      ballGroup.rotation.z=THREE.MathUtils.degToRad(-36);
+      ballGroup.position.set(0.05,1.72,0);
       group.add(ballGroup);
-
-      /* gold collar ring, cradling the ball's lower half, flatter/wider like a real trophy collar */
-      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.08,16,48),gold);
-      ring.rotation.x=Math.PI/2; ring.position.set(0,1.5,0);
-      group.add(ring);
-
-      /* black tapered riser — a 4-sided frustum, not a round cylinder, so it has flat faces */
-      var riser=new THREE.Mesh(new THREE.CylinderGeometry(0.4,0.64,0.85,4),riserMat);
-      riser.rotation.y=Math.PI/4;
-      riser.position.set(0,1.0,0);
-      group.add(riser);
-
-      /* nameplate, with the actual text baked onto a canvas texture, mounted on the riser's front face */
-      var pc=document.createElement("canvas"); pc.width=512; pc.height=220;
-      var pctx=pc.getContext("2d");
-      function drawPlate(font){
-        pctx.clearRect(0,0,512,220);
-        var g=pctx.createLinearGradient(0,0,0,220);
-        g.addColorStop(0,"#F9EABC"); g.addColorStop(.5,"#C7A245"); g.addColorStop(1,"#87671C");
-        pctx.fillStyle=g; pctx.fillRect(0,0,512,220);
-        pctx.fillStyle="#2E2308"; pctx.textAlign="center"; pctx.textBaseline="middle";
-        pctx.font="700 58px "+font;
-        pctx.fillText("LEAGUE",256,82);
-        pctx.fillText("CHAMPION",256,152);
-      }
-      drawPlate("Georgia, serif");
-      var plateTex=new THREE.CanvasTexture(pc);
-      plateTex.colorSpace=THREE.SRGBColorSpace;
-      try{
-        document.fonts.load('700 46px Cinzel').then(function(){
-          drawPlate("Cinzel, Georgia, serif");
-          plateTex.needsUpdate=true;
-        }).catch(function(){});
-      }catch(e){}
-      var plate=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.5,0.08),
-        new THREE.MeshStandardMaterial({map:plateTex,metalness:0.5,roughness:0.45}));
-      plate.position.set(0,1.0,0.42);
-      group.add(plate);
 
       /* wood shelf cap under the riser, before the column starts */
       var woodCap=new THREE.Mesh(new THREE.BoxGeometry(2.3,0.16,1.7),wood);
       woodCap.position.set(0,0.48,0);
       group.add(woodCap);
+
+      /* black riser — a real frustum, wide at the base, sharply narrowing toward the top */
+      var riserH=0.78;
+      var riser=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.72,riserH,4),riserMat);
+      riser.rotation.y=Math.PI/4;
+      riser.position.set(0,0.48+0.08+riserH/2,0);
+      group.add(riser);
+      var riserTop=riser.position.y+riserH/2;
+
+      /* nameplate, with the actual text baked onto a canvas texture, filling most of the riser's front face */
+      var pc=document.createElement("canvas"); pc.width=512; pc.height=340;
+      var pctx=pc.getContext("2d");
+      function drawPlate(font){
+        pctx.clearRect(0,0,512,340);
+        var g=pctx.createLinearGradient(0,0,0,340);
+        g.addColorStop(0,"#F9EABC"); g.addColorStop(.5,"#C7A245"); g.addColorStop(1,"#87671C");
+        pctx.fillStyle=g; pctx.fillRect(0,0,512,340);
+        pctx.fillStyle="#161200"; pctx.textAlign="center"; pctx.textBaseline="middle";
+        pctx.font="900 82px "+font;
+        pctx.fillText("LEAGUE",256,130);
+        pctx.fillText("CHAMPION",256,230);
+      }
+      drawPlate("Arial, sans-serif");
+      var plateTex=new THREE.CanvasTexture(pc);
+      plateTex.colorSpace=THREE.SRGBColorSpace;
+      var plate=new THREE.Mesh(new THREE.BoxGeometry(0.92,0.62,0.06),
+        new THREE.MeshStandardMaterial({map:plateTex,metalness:0.4,roughness:0.4}));
+      plate.position.set(0,riser.position.y-0.06,0.52);
+      group.add(plate);
+
+      /* small gold tapered stem connecting the riser to the ring */
+      var stem=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.2,0.22,20),gold);
+      stem.position.set(0,riserTop+0.11,0);
+      group.add(stem);
+
+      /* gold collar ring, right where the ball rests */
+      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.46,0.1,16,48),gold);
+      ring.rotation.x=Math.PI/2; ring.position.set(0,riserTop+0.31,0);
+      group.add(ring);
 
       /* column + plates: 6 on the front, 5 on the right, back/left stay blank */
       var colW=2.05,colH=3.5,colD=1.5;
