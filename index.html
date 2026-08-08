@@ -185,6 +185,23 @@ input{font:inherit}
 }
 .btn:hover{background:rgba(199,162,69,.12);border-color:var(--brass);color:#F0E2B8}
 .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.cta-row{display:flex;justify-content:center;margin-top:30px}
+.cta-suggest{
+  font-family:var(--cut);font-size:16px;font-weight:700;letter-spacing:.03em;
+  text-align:center;color:#2E2308;text-decoration:none;
+  padding:18px 38px;border-radius:2px;
+  background:linear-gradient(168deg,var(--brass-hi) 0%,var(--brass) 34%,var(--brass-lo) 66%,var(--brass) 100%);
+  box-shadow:0 3px 0 rgba(0,0,0,.45),0 10px 18px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,240,200,.35);
+  transition:transform .25s cubic-bezier(.3,1,.4,1),box-shadow .25s;
+  animation:championGlow 2.6s ease-in-out infinite;
+}
+.cta-suggest:hover{transform:translateY(-2px)}
+.suggest-link.closed{
+  pointer-events:none;cursor:not-allowed;filter:grayscale(.6);opacity:.5;animation:none;box-shadow:none;
+}
+.suggest-link.closed:hover{transform:none;background:transparent}
+.cta-suggest.closed:hover{transform:none}
+.cta-note{margin:14px auto 0;max-width:480px;text-align:center;font-size:14px;color:var(--ivory-dim);font-style:italic}
 
 /* ================= the descent ================= */
 .descent{
@@ -636,8 +653,8 @@ input{font:inherit}
 }
 .rule-body{min-width:0}
 .rule-t{
-  width:100%;background:transparent;border:0;border-bottom:1px solid transparent;
-  font-family:var(--cut);font-weight:700;font-size:17px;letter-spacing:.09em;text-transform:uppercase;
+  display:block;width:100%;background:transparent;border:0;border-bottom:1px solid transparent;resize:none;overflow:hidden;
+  font-family:var(--cut);font-weight:700;font-size:17px;line-height:1.3;letter-spacing:.09em;text-transform:uppercase;
   color:#EDE8DB;text-shadow:0 1px 0 rgba(255,255,255,.12),0 -1px 1px rgba(0,0,0,.55);padding:4px 0;
 }
 .rule-b{
@@ -656,6 +673,22 @@ input{font:inherit}
 .empty-note{color:var(--ivory-dim);font-style:italic;padding:8px 0 4px}
 
 /* ================= the floor ================= */
+.vote-status{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:7px 16px;
+  font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:20px;border:1px solid;
+}
+.vote-status .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.vote-status.open{color:#9CBF9A;border-color:#5A7A4E;background:rgba(90,122,78,.12)}
+.vote-status.open .dot{background:#8FBF7E;box-shadow:0 0 0 0 rgba(143,191,126,.6);animation:votePulse 1.8s ease-out infinite}
+.vote-status.upcoming{color:var(--brass);border-color:rgba(199,162,69,.5);background:rgba(199,162,69,.08)}
+.vote-status.upcoming .dot{background:var(--brass)}
+.vote-status.closed{color:var(--ivory-dim);border-color:rgba(239,231,214,.22);background:rgba(239,231,214,.04)}
+.vote-status.closed .dot{background:var(--ivory-dim)}
+@keyframes votePulse{
+  0%{box-shadow:0 0 0 0 rgba(143,191,126,.55)}
+  100%{box-shadow:0 0 0 8px rgba(143,191,126,0)}
+}
 .floor-rules{list-style:none;margin:0 0 20px;padding:14px 18px;border-left:2px solid rgba(199,162,69,.4);
   background:rgba(199,162,69,.05);}
 .floor-rules li{font-size:14.5px;color:var(--ivory-dim);line-height:1.55}
@@ -1025,7 +1058,7 @@ body.shake{animation:pageShake .42s ease}
   <div class="shelf"></div>
 
   <div class="dedication">
-    <h1>The FF Murikuh<br>League Champion Trophy</h1>
+    <h1>The FF Murikuh<br>League Champions Trophy</h1>
     <div class="divider"></div>
     <p>Held by <span class="held" id="holder">nobody</span></p>
   </div>
@@ -1150,11 +1183,6 @@ body.shake{animation:pageShake .42s ease}
         <h3>Roll of Honour</h3>
         <ul class="roll" id="roll"></ul>
         <div class="cellar" id="cellar"></div>
-        <div class="btn-row">
-          <button class="btn" id="btnExport">Download</button>
-          <button class="btn" id="btnImport">Load file</button>
-          <input type="file" id="importInput" accept="application/json,.json" hidden>
-        </div>
       </div>
     </div>
   </div>
@@ -1164,12 +1192,13 @@ body.shake{animation:pageShake .42s ease}
 <section class="sec" id="rules">
   <div class="sec-head">
     <h2>Standing Commandments</h2>
-    <p>How the league runs, carved in stone. Edit any line; it saves itself. <span class="saved" id="rulesSaved">Saved</span></p>
+    <p>Voted into law by the league, season after season — not decreed by one person. Edit any line; it saves itself. <span class="saved" id="rulesSaved">Saved</span></p>
   </div>
   <ol class="rules" id="rulesList"></ol>
-  <div class="btn-row">
-    <button class="btn" id="btnAddRule">Add a commandment</button>
+  <div class="cta-row">
+    <a class="cta-suggest suggest-link" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
   </div>
+  <p class="cta-note">Propose a new commandment or an edit to an existing one — it goes up for a vote on the floor below. If it passes, it gets carved in stone.<br>Rule suggestions close <strong>11:59 PM ET, Saturday, August 15</strong>.</p>
 </section>
 
 <!-- ================= the floor ================= -->
@@ -1177,15 +1206,18 @@ body.shake{animation:pageShake .42s ease}
   <div class="sec-head">
     <h2>On the Floor</h2>
     <p>Amendments up for a vote ahead of 2026-2027. A majority carries it.</p>
+    <div class="vote-status" id="voteStatus"></div>
   </div>
 
   <ul class="floor-rules">
     <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
-    <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 22</strong>.</li>
+    <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 15</strong>.</li>
+    <li>Voting is open <strong>Monday, August 17</strong> through <strong>Saturday, August 22 at 11:59 PM ET</strong>.</li>
+    <li>New rules take effect before the season starts.</li>
   </ul>
 
   <div class="btn-row">
-    <a class="btn" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
+    <a class="btn suggest-link" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
   </div>
 
   <div class="auth-box" id="authBox"></div>
@@ -1198,7 +1230,11 @@ body.shake{animation:pageShake .42s ease}
 
   <div id="adminPanel" hidden>
     <div class="btn-row">
+      <button class="btn" id="btnAddRule">Add a commandment</button>
       <button class="btn" id="btnCopy">Copy the tally</button>
+      <button class="btn" id="btnExport">Download</button>
+      <button class="btn" id="btnImport">Load file</button>
+      <input type="file" id="importInput" accept="application/json,.json" hidden>
     </div>
 
     <div class="tuck">
@@ -1520,6 +1556,21 @@ var armPlates=(function(){
     entries.forEach(function(en){ nav.classList.toggle("show",!en.isIntersecting) });
   },{rootMargin:"-72px 0px 0px 0px"});
   io.observe(head);
+})();
+
+/* ---------- wayfinder taps: scroll by a live-measured offset instead of trusting scroll-margin-top, which some mobile browsers undershoot ---------- */
+(function wayfinderScroll(){
+  var nav=$("wayfinder"); if(!nav) return;
+  Array.prototype.forEach.call(nav.querySelectorAll("a[href^='#']"),function(a){
+    a.addEventListener("click",function(e){
+      var id=a.getAttribute("href").slice(1), target=document.getElementById(id);
+      if(!target) return;
+      e.preventDefault();
+      var y=target.getBoundingClientRect().top+window.scrollY-(nav.getBoundingClientRect().height+56);
+      window.scrollTo({top:Math.max(y,0),behavior:REDUCE?"auto":"smooth"});
+      history.pushState(null,"","#"+id);
+    });
+  });
 })();
 
 /* ---------- ambient sparkle motes drifting past the trophy ---------- */
@@ -1926,7 +1977,14 @@ $("importInput").addEventListener("change",function(){
 /* ---------- standing rules ---------- */
 var DEFAULT_RULES=[
   {t:"Custody of the trophy",b:"The champion keeps it until the next title game. It travels — it does not live at the commissioner's house."},
-  {t:"Engraving",b:"Every champion gets a plate: season, owner, team name. The team name is whatever it was on the final day, spelling and all."}
+  {t:"Engraving",b:"Every champion gets a plate: season, owner, team name. The team name is whatever it was on the final day, spelling and all."},
+  {t:"The loser's toll",b:"Last place pays the commissioner an extra $10, put toward the winner's nameplate and shipping the trophy."},
+  {t:"Field goal scoring",b:"3 points for 0–39 yards, 4 for 40–49, 5 for 50–59, and 6 for a kick of 60+ yards."},
+  {t:"Missed extra points",b:"A missed PAT costs your team 1 point."},
+  {t:"IR roster spots",b:"Two IR slots per roster."},
+  {t:"Bench roster spots",b:"Six bench spots per roster."},
+  {t:"Draft order",b:"Set by a spin wheel one week before the draft — not an auto-pick at kickoff."},
+  {t:"Group text vs. Telegram",b:"League business goes in Telegram, not the group text. Respond in the group text and it's 1,000 lashings."}
 ];
 function renderRules(){
   var ol=$("rulesList"); ol.innerHTML="";
@@ -1938,25 +1996,33 @@ function renderRules(){
     var li=document.createElement("li");
     li.className="rule";
     li.innerHTML='<div class="rule-no">'+roman(i+1)+'</div><div class="rule-body">'+
-      '<input class="rule-t" data-i="'+i+'" data-k="t" value="'+esc(r.t)+'" placeholder="Name of the commandment" aria-label="Commandment '+(i+1)+' title">'+
+      '<textarea class="rule-t" rows="1" data-i="'+i+'" data-k="t" placeholder="Name of the commandment" aria-label="Commandment '+(i+1)+' title">'+esc(r.t)+'</textarea>'+
       '<textarea class="rule-b" data-i="'+i+'" data-k="b" placeholder="What it says" aria-label="Commandment '+(i+1)+' text">'+esc(r.b)+'</textarea>'+
-      '<button class="rule-strike" type="button">Strike this commandment</button></div>';
+      (ADMIN?'<button class="rule-strike" type="button">Strike this commandment</button>':'')+'</div>';
     ol.appendChild(li);
-    var bField=li.querySelector(".rule-b");
-    autoGrow(bField);
+    var tField=li.querySelector(".rule-t"), bField=li.querySelector(".rule-b");
+    autoGrow(tField); autoGrow(bField);
+    tField.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); tField.blur(); } });
     Array.prototype.forEach.call(li.querySelectorAll("[data-k]"),function(f){
       f.addEventListener("input",function(){
         rules[+f.dataset.i][f.dataset.k]=f.value; saveRules();
-        if(f===bField) autoGrow(f);
+        autoGrow(f);
       });
     });
-    li.querySelector(".rule-strike").addEventListener("click",function(){
+    var strikeBtn=li.querySelector(".rule-strike");
+    if(strikeBtn) strikeBtn.addEventListener("click",function(){
       if(!confirm("Strike commandment "+roman(i+1)+" from the tablet?")) return;
       rules.splice(i,1); saveRules(); renderRules();
     });
   });
 }
 function autoGrow(t){ if(!t) return; t.style.height="auto"; t.style.height=(t.scrollHeight+2)+"px"; }
+/* re-measure once the web font swaps in — scrollHeight taken against the fallback serif undersizes wrapped titles */
+if(document.fonts&&document.fonts.ready){
+  document.fonts.ready.then(function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".rule-t,.rule-b"),autoGrow);
+  });
+}
 function roman(n){
   var map=[[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]],out="";
   map.forEach(function(m){ while(n>=m[0]){ out+=m[1]; n-=m[0]; } });
@@ -1987,6 +2053,25 @@ var SEED_FLOOR=[
    desc:"Part 1 (pick one) \u2014 what defines a \u201Closer\u201D?\n\u203A Whoever has the worst record at the end of week 14?\n\u203A Whoever has the worst record at the very end?\n\nIf the latter, then Part 2 (yes or no):\n\u203A At the start of week 15 / the playoffs, those not in the playoffs cannot touch the waiver wire, but are welcome to pick from free agents after the fact.",
    why:"We never really decided what \u201Closer\u201D actually meant.",note:""}
 ];
+/* voting window: 12:00 AM ET Monday Aug 17 through 11:59:59 PM ET Saturday Aug 22, 2026 */
+var VOTE_OPEN=new Date("2026-08-17T04:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T03:59:59Z");
+function votingPhase(){
+  var now=Date.now();
+  if(now<VOTE_OPEN.getTime()) return "upcoming";
+  if(now<=VOTE_CLOSE.getTime()) return "open";
+  return "closed";
+}
+function renderVoteStatus(){
+  var el=$("voteStatus"); if(!el) return;
+  var phase=votingPhase();
+  var msg={
+    upcoming:"Voting opens Monday, August 17",
+    open:"Voting is open — closes Saturday, August 22, 11:59 PM ET",
+    closed:"Voting is closed"
+  }[phase];
+  el.className="vote-status "+phase;
+  el.innerHTML='<span class="dot"></span>'+msg;
+}
 function threshold(){ return Math.floor(teams/2)+1 }
 function count(id,kind){ var c=voteCounts[id]; return c?(c[kind]||0):0; }
 function statusOf(p){
@@ -2063,8 +2148,9 @@ function makeVoteBtn(pid,choice,label){
   b.type="button";
   b.className="vote-btn "+choice+(myVotes[pid]===choice?" on":"");
   b.textContent=label;
-  b.disabled=!session;
-  b.title=session?"":"Log in above to vote";
+  var phase=votingPhase();
+  b.disabled=!session||phase!=="open";
+  b.title=!session?"Log in above to vote":phase==="upcoming"?"Voting opens Monday, August 17":phase==="closed"?"Voting has closed":"";
   b.addEventListener("click",function(){
     if(myVotes[pid]!==choice) voteToss(b);
     castVote(pid,choice);
@@ -2248,12 +2334,26 @@ $("btnLoadPaste").addEventListener("click",function(){
   try{ ingest(v,"pasted data"); }catch(e){ say(e.message,"err"); }
 });
 
+/* ---------- rule suggestion deadline ---------- */
+(function suggestDeadline(){
+  var DEADLINE=new Date("2026-08-16T03:59:59Z"); /* 11:59:59 PM ET, Saturday, August 15 */
+  if(Date.now()<=DEADLINE.getTime()) return;
+  Array.prototype.forEach.call(document.querySelectorAll(".suggest-link"),function(a){
+    a.classList.add("closed");
+    a.textContent="Submissions Closed";
+    a.removeAttribute("href"); a.removeAttribute("target");
+    a.setAttribute("aria-disabled","true"); a.setAttribute("role","button");
+    a.addEventListener("click",function(e){ e.preventDefault(); });
+  });
+})();
+
 /* ---------- boot ---------- */
+renderVoteStatus();
 sb.auth.onAuthStateChange(function(event,sess){
   session=sess;
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
-  renderAuth();
+  renderAuth(); renderRules();
   refreshVotes().then(renderFloor);
 });
 Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),store.get("ffm:floor")])
