@@ -1305,34 +1305,6 @@ body.shake{animation:pageShake .42s ease}
   </div>
 
   <div id="props"></div>
-
-  <div id="adminPanel" hidden>
-    <div class="btn-row">
-      <button class="btn" id="btnAddRule">Add a commandment</button>
-      <button class="btn" id="btnCopy">Copy the tally</button>
-      <button class="btn" id="btnExport">Download</button>
-      <button class="btn" id="btnImport">Load file</button>
-      <input type="file" id="importInput" accept="application/json,.json" hidden>
-    </div>
-
-    <div class="tuck">
-      <button class="link" id="btnSheetToggle">Also pull from the form sheet</button>
-      <div class="paper" id="sheetPanel" hidden>
-        <label for="csvUrl">Published CSV link from your form's response sheet</label>
-        <input type="url" id="csvUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
-        <div class="btn-row">
-          <button class="btn" id="btnLoad">Load submissions</button>
-          <button class="btn" id="btnPaste">Paste CSV instead</button>
-        </div>
-        <textarea id="pasteBox" rows="5" placeholder="Paste the CSV here, then press Load pasted CSV" style="display:none;margin-top:12px"></textarea>
-        <div class="btn-row" id="pasteRow" style="display:none">
-          <button class="btn" id="btnLoadPaste">Load pasted CSV</button>
-        </div>
-        <p class="note">Paste any Google Sheets link — the page works out the export address itself. If Google refuses it, open the sheet and use File → Share → Publish to web → Form Responses → CSV, then paste that link. Submissions land alongside anything typed above.</p>
-        <div class="msg" id="msg"></div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <!-- ================= draft availability ================= -->
@@ -1367,6 +1339,40 @@ body.shake{animation:pageShake .42s ease}
     <div class="tally-card">
       <h3 class="tally-card-title">Draft Availability</h3>
       <ul class="tally-list" id="draftTallyList"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= admin ================= -->
+<section class="sec" id="adminPanel" hidden>
+  <div class="sec-head">
+    <h2>Commissioner's Desk</h2>
+    <p>Tools for tv00151@gmail.com and jamiesframies@gmail.com only.</p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btnAddRule">Add a commandment</button>
+    <button class="btn" id="btnCopy">Copy the tally</button>
+    <button class="btn" id="btnExport">Download</button>
+    <button class="btn" id="btnImport">Load file</button>
+    <input type="file" id="importInput" accept="application/json,.json" hidden>
+  </div>
+
+  <div class="tuck">
+    <button class="link" id="btnSheetToggle">Also pull from the form sheet</button>
+    <div class="paper" id="sheetPanel" hidden>
+      <label for="csvUrl">Published CSV link from your form's response sheet</label>
+      <input type="url" id="csvUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+      <div class="btn-row">
+        <button class="btn" id="btnLoad">Load submissions</button>
+        <button class="btn" id="btnPaste">Paste CSV instead</button>
+      </div>
+      <textarea id="pasteBox" rows="5" placeholder="Paste the CSV here, then press Load pasted CSV" style="display:none;margin-top:12px"></textarea>
+      <div class="btn-row" id="pasteRow" style="display:none">
+        <button class="btn" id="btnLoadPaste">Load pasted CSV</button>
+      </div>
+      <p class="note">Paste any Google Sheets link — the page works out the export address itself. If Google refuses it, open the sheet and use File → Share → Publish to web → Form Responses → CSV, then paste that link. Submissions land alongside anything typed above.</p>
+      <div class="msg" id="msg"></div>
     </div>
   </div>
 </section>
