@@ -849,7 +849,8 @@ input{font:inherit}
 .auth-msg{flex:1 1 100%;font-size:13.5px;color:var(--ivory-dim);font-style:italic}
 .auth-msg.err{color:#E2A99A}
 .meter{height:6px;background:rgba(255,255,255,.08);border-radius:8px;margin-top:14px;overflow:hidden;position:relative}
-.meter i{display:block;height:100%;background:#5A7A4E;transition:width .3s;position:relative;overflow:hidden}
+.meter i{position:absolute;top:0;bottom:0;left:0;background:#5A7A4E;transition:width .3s;overflow:hidden}
+.meter i.nay{left:auto;right:0;background:#9B4033}
 .meter i::after{
   content:"";position:absolute;inset:0;background-size:220% 100%;
   background-image:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.6) 38%,transparent 56%);
@@ -2446,7 +2447,9 @@ function renderFloor(){
     if(p.why) html+='<p class="why">'+nl2br(esc(p.why))+'</p>';
     if(p.note) html+='<p style="color:var(--ivory-dim);font-size:14.5px">'+esc(p.note)+'</p>';
     html+='<div class="vote-row" role="group" aria-label="Cast your vote"></div>'+
-          '<div class="meter"><i style="width:'+Math.min(100,y/teams*100)+'%"></i><b style="left:'+(t/teams*100)+'%"></b></div>'+
+          '<div class="meter"><i style="width:'+Math.min(100,y/teams*100)+'%"></i>'+
+          '<i class="nay" style="width:'+Math.min(100,n/teams*100)+'%"></i>'+
+          '<b style="left:'+(t/teams*100)+'%"></b></div>'+
           '<div class="tally">'+y+' yea · '+n+' nay — needs '+t+
           (p.src==="sheet"?' <span class="src">· from the form</span>':'')+'</div>';
     el.innerHTML=html;
