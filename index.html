@@ -588,6 +588,13 @@ input{font:inherit}
 }
 .pip-extra{margin-left:2px;font-family:var(--ui);font-weight:600;font-size:15px}
 .roll .none{color:var(--ivory-dim);font-style:italic;font-size:15px;border:0}
+/* the pip icons render tall (200x420 viewBox) — condense rows on mobile so Roll of Honour doesn't run on forever */
+@media(max-width:640px){
+  .roll li{padding:8px 0;gap:8px}
+  .roll .nm{font-size:12.5px}
+  .roll .pips{gap:4px}
+  .pip-trophy{width:16px}
+}
 .cellar{margin-top:16px;padding-top:14px;border-top:1px solid rgba(199,162,69,.24)}
 .cellar.empty{margin-top:0;padding-top:0;border-top:0}
 .cellar-shame{
