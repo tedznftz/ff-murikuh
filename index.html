@@ -2053,7 +2053,7 @@ var SEED_FLOOR=[
    why:"We never really decided what \u201Closer\u201D actually meant.",note:""}
 ];
 /* voting window: 12:00 AM ET Monday Aug 17 through 11:59:59 PM ET Saturday Aug 22, 2026 */
-var VOTE_OPEN=new Date("2026-08-17T04:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T03:59:59Z");
+var VOTE_OPEN=new Date("2020-01-01T00:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T03:59:59Z"); /* TEMP: opened early for login/vote testing — revert to 2026-08-17T04:00:00Z */
 function votingPhase(){
   var now=Date.now();
   if(now<VOTE_OPEN.getTime()) return "upcoming";
