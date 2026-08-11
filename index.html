@@ -1340,7 +1340,7 @@ body.shake{animation:pageShake .42s ease}
 </section>
 
 <!-- ================= the tally ================= -->
-<section class="sec" id="summary">
+<section class="sec" id="summary" hidden>
   <div class="sec-head">
     <h2>The Tally</h2>
     <p>Where the floor and the draft scheduling stand right now.</p>
@@ -2622,6 +2622,7 @@ sb.auth.onAuthStateChange(function(event,sess){
   session=sess;
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
+  $("summary").hidden=!ADMIN;
   renderAuth(); renderRules(); renderPlates();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
@@ -2638,6 +2639,7 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   floor=floor.concat(SEED_FLOOR);
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
+  $("summary").hidden=!ADMIN;
   renderPlates(); renderRules(); renderAuth(); renderFloor();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
@@ -2649,6 +2651,7 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   seasons=blankSeasons(); rules=DEFAULT_RULES.slice(); floor=SEED_FLOOR.slice();
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
+  $("summary").hidden=!ADMIN;
   renderPlates(); renderRules(); renderAuth(); renderFloor();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
