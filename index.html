@@ -783,6 +783,17 @@ input{font:inherit}
 .vote-btn:disabled{opacity:.35;cursor:not-allowed}
 .vote-btn.yea.on{background:#5A7A4E;border-color:#5A7A4E;color:#F3ECDC}
 .vote-btn.nay.on{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
+.auth-card{
+  margin-bottom:22px;padding:24px 26px;border-radius:2px;text-align:center;
+  border:1px solid rgba(199,162,69,.5);
+  background:linear-gradient(180deg,rgba(199,162,69,.12),rgba(199,162,69,.03));
+  box-shadow:0 3px 0 rgba(0,0,0,.4),0 14px 26px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,240,200,.08);
+}
+.auth-card-title{
+  font-family:var(--cut);font-size:19px;font-weight:700;letter-spacing:.03em;
+  color:#EDDBA0;text-shadow:0 1px 0 rgba(255,255,255,.1),0 -1px 1px rgba(0,0,0,.5);margin:0 0 16px;
+}
+.auth-card .auth-box{margin-bottom:0;padding:0;border:0;background:transparent;justify-content:center}
 .auth-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px;padding:14px 18px;
   border:1px solid rgba(199,162,69,.28);border-radius:2px;background:rgba(199,162,69,.05)}
 .auth-box input[type=email],.auth-box input[type=text]{flex:1 1 220px;background:rgba(0,0,0,.28);border:1px solid rgba(199,162,69,.28);
@@ -1223,18 +1234,17 @@ body.shake{animation:pageShake .42s ease}
     <div class="vote-status" id="voteStatus"></div>
   </div>
 
+  <div class="auth-card">
+    <h3 class="auth-card-title" id="authCardTitle">Log in to vote</h3>
+    <div class="auth-box" id="authBox"></div>
+  </div>
+
   <ul class="floor-rules">
     <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
     <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 15</strong>.</li>
     <li>Voting is open <strong>Monday, August 17</strong> through <strong>Saturday, August 22 at 11:59 PM ET</strong>.</li>
     <li>New rules take effect before the season starts.</li>
   </ul>
-
-  <div class="btn-row">
-    <a class="btn suggest-link" href="https://forms.gle/QhJp6bsL5WHQ8SaTA" target="_blank" rel="noopener noreferrer">Submit Your Rule Suggestions Here</a>
-  </div>
-
-  <div class="auth-box" id="authBox"></div>
 
   <div class="floor-head">
     <span class="src" id="floorCount"></span>
@@ -2109,8 +2119,10 @@ function nl2br(t){ return t.replace(/\n/g,"<br>") }
 var authPendingEmail=null;
 function renderAuth(){
   var box=$("authBox"); if(!box) return;
+  var title=$("authCardTitle");
   if(session){
     authPendingEmail=null;
+    if(title) title.textContent="You're in";
     box.innerHTML='<span class="who">Voting as <strong>'+esc(session.user.email)+'</strong></span>'+
       '<button class="link" id="btnLogout" type="button">Log out</button>'+
       '<span class="auth-msg" id="voteMsg"></span>';
@@ -2118,6 +2130,7 @@ function renderAuth(){
     return;
   }
   if(authPendingEmail){
+    if(title) title.textContent="Enter your code";
     box.innerHTML='<span class="who">Code sent to <strong>'+esc(authPendingEmail)+'</strong></span>'+
       '<input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" aria-label="Login code">'+
       '<button class="btn" id="btnVerify" type="button">Verify</button>'+
@@ -2144,6 +2157,7 @@ function renderAuth(){
     $("authCode").focus();
     return;
   }
+  if(title) title.textContent="Log in to vote";
   box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
     '<button class="btn" id="btnSendLink" type="button">Send code</button>'+
     '<span class="auth-msg" id="authMsg">Owners get a 6-digit code by email to cast YEA/NAY votes.</span>';
