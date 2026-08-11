@@ -2223,10 +2223,10 @@ function renderAuth(){
   if(authPendingEmail){
     if(title) title.textContent="Enter your code";
     box.innerHTML='<span class="who">Code sent to <strong>'+esc(authPendingEmail)+'</strong></span>'+
-      '<input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" aria-label="Login code">'+
+      '<input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="8-digit code" aria-label="Login code">'+
       '<button class="btn" id="btnVerify" type="button">Verify</button>'+
       '<button class="link" id="btnCancelCode" type="button">Use a different email</button>'+
-      '<span class="auth-msg" id="authMsg">Type the 6-digit code from that email above, or just click the login link in it instead — either one logs you in.</span>';
+      '<span class="auth-msg" id="authMsg">Type the 8-digit code from that email above, or just click the login link in it instead — either one logs you in.</span>';
     var verify=function(){
       var code=$("authCode").value.trim();
       var msg=$("authMsg");
@@ -2251,7 +2251,7 @@ function renderAuth(){
   if(title) title.textContent="Log in to vote";
   box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
     '<button class="btn" id="btnSendLink" type="button">Send code</button>'+
-    '<span class="auth-msg" id="authMsg">Owners get an email with a login link and a 6-digit code — click the link or type the code, whichever’s easier.</span>';
+    '<span class="auth-msg" id="authMsg">Owners get an email with a login link and an 8-digit code — click the link or type the code, whichever’s easier.</span>';
   var send=function(){
     var email=$("authEmail").value.trim();
     var msg=$("authMsg");
