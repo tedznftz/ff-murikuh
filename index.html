@@ -1242,9 +1242,10 @@ body.shake{animation:pageShake .42s ease}
   <ul class="floor-rules">
     <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
     <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 15</strong>.</li>
-    <li>Voting is open <strong>Monday, August 17</strong> through <strong>Saturday, August 22 at 11:59 PM ET</strong>.</li>
     <li>New rules take effect before the season starts.</li>
   </ul>
+
+  <div class="shelf" style="margin:26px auto"></div>
 
   <div class="floor-head">
     <span class="src" id="floorCount"></span>
@@ -1306,7 +1307,7 @@ var SUPABASE_KEY="sb_publishable_XEgvp_Qh7Wr-gRQGz2HfMg_4tym7Vt2";
 var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 var session=null;
 /* commissioner-only tools (admin panel, promote-to-commandment) unlock for these logged-in emails */
-var ADMIN_EMAILS=["tv00151@gmail.com"];
+var ADMIN_EMAILS=["tv00151@gmail.com","jamiesframies@gmail.com"];
 var ADMIN=false;
 function computeAdmin(){
   return !!(session&&session.user&&session.user.email&&ADMIN_EMAILS.indexOf(session.user.email)>-1);
@@ -2135,7 +2136,7 @@ function renderAuth(){
       '<input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" aria-label="Login code">'+
       '<button class="btn" id="btnVerify" type="button">Verify</button>'+
       '<button class="link" id="btnCancelCode" type="button">Use a different email</button>'+
-      '<span class="auth-msg" id="authMsg">Enter the code from the email to finish logging in.</span>';
+      '<span class="auth-msg" id="authMsg">Type the 6-digit code from that email above, or just click the login link in it instead — either one logs you in.</span>';
     var verify=function(){
       var code=$("authCode").value.trim();
       var msg=$("authMsg");
@@ -2160,7 +2161,7 @@ function renderAuth(){
   if(title) title.textContent="Log in to vote";
   box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
     '<button class="btn" id="btnSendLink" type="button">Send code</button>'+
-    '<span class="auth-msg" id="authMsg">Owners get a 6-digit code by email to cast YEA/NAY votes.</span>';
+    '<span class="auth-msg" id="authMsg">Owners get an email with a login link and a 6-digit code — click the link or type the code, whichever’s easier.</span>';
   var send=function(){
     var email=$("authEmail").value.trim();
     var msg=$("authMsg");
