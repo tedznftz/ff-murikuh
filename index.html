@@ -771,9 +771,9 @@ input{font:inherit}
 .vote-btn.nay.on{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
 .auth-box{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px;padding:14px 18px;
   border:1px solid rgba(199,162,69,.28);border-radius:2px;background:rgba(199,162,69,.05)}
-.auth-box input[type=email]{flex:1 1 220px;background:rgba(0,0,0,.28);border:1px solid rgba(199,162,69,.28);
+.auth-box input[type=email],.auth-box input[type=text]{flex:1 1 220px;background:rgba(0,0,0,.28);border:1px solid rgba(199,162,69,.28);
   border-radius:1px;color:var(--ivory);font-family:var(--body);font-size:15px;padding:9px 12px}
-.auth-box input[type=email]::placeholder{color:rgba(183,172,150,.45);font-style:italic}
+.auth-box input[type=email]::placeholder,.auth-box input[type=text]::placeholder{color:rgba(183,172,150,.45);font-style:italic}
 .auth-box .who{font-size:14.5px;color:var(--ivory-dim)}
 .auth-box .who strong{color:var(--ivory);font-weight:500}
 .auth-msg{flex:1 1 100%;font-size:13.5px;color:var(--ivory-dim);font-style:italic}
@@ -1983,8 +1983,7 @@ var DEFAULT_RULES=[
   {t:"Missed extra points",b:"A missed PAT costs your team 1 point."},
   {t:"IR roster spots",b:"Two IR slots per roster."},
   {t:"Bench roster spots",b:"Six bench spots per roster."},
-  {t:"Draft order",b:"Set by a spin wheel one week before the draft — not an auto-pick at kickoff."},
-  {t:"Group text vs. Telegram",b:"League business goes in Telegram, not the group text. Respond in the group text and it's 1,000 lashings."}
+  {t:"Draft order",b:"Set by a spin wheel one week before the draft — not an auto-pick at kickoff."}
 ];
 function renderRules(){
   var ol=$("rulesList"); ol.innerHTML="";
@@ -2081,32 +2080,61 @@ function statusOf(p){
   return "open";
 }
 function nl2br(t){ return t.replace(/\n/g,"<br>") }
-/* ---------- login (magic link, invite-only) ---------- */
+/* ---------- login (email code, invite-only) ---------- */
+var authPendingEmail=null;
 function renderAuth(){
   var box=$("authBox"); if(!box) return;
   if(session){
+    authPendingEmail=null;
     box.innerHTML='<span class="who">Voting as <strong>'+esc(session.user.email)+'</strong></span>'+
       '<button class="link" id="btnLogout" type="button">Log out</button>'+
       '<span class="auth-msg" id="voteMsg"></span>';
     $("btnLogout").addEventListener("click",function(){ sb.auth.signOut(); });
     return;
   }
+  if(authPendingEmail){
+    box.innerHTML='<span class="who">Code sent to <strong>'+esc(authPendingEmail)+'</strong></span>'+
+      '<input type="text" id="authCode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" aria-label="Login code">'+
+      '<button class="btn" id="btnVerify" type="button">Verify</button>'+
+      '<button class="link" id="btnCancelCode" type="button">Use a different email</button>'+
+      '<span class="auth-msg" id="authMsg">Enter the code from the email to finish logging in.</span>';
+    var verify=function(){
+      var code=$("authCode").value.trim();
+      var msg=$("authMsg");
+      if(!code){ $("authCode").focus(); return; }
+      msg.textContent="Checking…"; msg.className="auth-msg";
+      sb.auth.verifyOtp({email:authPendingEmail,token:code,type:"email"}).then(function(res){
+        if(res.error){
+          msg.textContent="That code didn't work — check it and try again.";
+          msg.className="auth-msg err";
+          return;
+        }
+        // onAuthStateChange picks up the new session and re-renders
+      });
+    };
+    $("btnVerify").addEventListener("click",verify);
+    $("authCode").addEventListener("keydown",function(e){ if(e.key==="Enter") verify(); });
+    $("btnCancelCode").addEventListener("click",function(){ authPendingEmail=null; renderAuth(); });
+    $("authCode").focus();
+    return;
+  }
   box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
-    '<button class="btn" id="btnSendLink" type="button">Send login link</button>'+
-    '<span class="auth-msg" id="authMsg">Owners log in with a magic link to cast YEA/NAY votes.</span>';
+    '<button class="btn" id="btnSendLink" type="button">Send code</button>'+
+    '<span class="auth-msg" id="authMsg">Owners get a 6-digit code by email to cast YEA/NAY votes.</span>';
   var send=function(){
     var email=$("authEmail").value.trim();
     var msg=$("authMsg");
     if(!email){ $("authEmail").focus(); return; }
     msg.textContent="Sending…"; msg.className="auth-msg";
-    sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}})
+    sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false}})
       .then(function(res){
         if(res.error){
           msg.textContent="That email isn't on the owner list yet — ask the commissioner to add it.";
           msg.className="auth-msg err";
           return;
         }
-        msg.textContent="Check "+email+" for a login link.";
+        authPendingEmail=email;
+        renderAuth();
       });
   };
   $("btnSendLink").addEventListener("click",send);
