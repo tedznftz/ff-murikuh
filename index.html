@@ -2105,7 +2105,8 @@ function renderAuth(){
       msg.textContent="Checking…"; msg.className="auth-msg";
       sb.auth.verifyOtp({email:authPendingEmail,token:code,type:"email"}).then(function(res){
         if(res.error){
-          msg.textContent="That code didn't work — check it and try again.";
+          console.error("verifyOtp error:",res.error);
+          msg.textContent="That code didn't work — check it and try again. ("+res.error.message+")";
           msg.className="auth-msg err";
           return;
         }
@@ -2129,7 +2130,8 @@ function renderAuth(){
     sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false}})
       .then(function(res){
         if(res.error){
-          msg.textContent="That email isn't on the owner list yet — ask the commissioner to add it.";
+          console.error("signInWithOtp error:",res.error);
+          msg.textContent="That email isn't on the owner list yet — ask the commissioner to add it. ("+res.error.message+")";
           msg.className="auth-msg err";
           return;
         }
