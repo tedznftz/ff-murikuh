@@ -656,6 +656,7 @@ input{font:inherit}
 .cellar-copy{position:relative;z-index:1;min-width:0}
 .cellar-label{font-family:var(--ui);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#C98686}
 .cellar-name{font-family:var(--cut);font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#EFE0DD;margin-top:3px;word-break:break-word}
+.name-blur{filter:blur(4px);user-select:none;cursor:help}
 .cellar-count{font-size:12.5px;color:rgba(239,224,221,.62);font-style:italic;margin-top:2px}
 
 /* ================= standing rules — the commandments ================= */
@@ -1527,6 +1528,16 @@ function merge(stored){
   return base;
 }
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+/* first name shows plain; last name blurs out until you're logged in */
+function nameHTML(full){
+  full=(full||"").trim();
+  if(!full) return "";
+  if(session) return esc(full);
+  var sp=full.lastIndexOf(" ");
+  if(sp<0) return esc(full);
+  var first=full.slice(0,sp), last=full.slice(sp+1);
+  return esc(first)+' <span class="name-blur" title="Log in to see who this is">'+esc(last)+'</span>';
+}
 
 /* ---------- the plates ---------- */
 function renderPlates(){
@@ -1602,7 +1613,7 @@ function plateFace(s){
                         '<span class="plate-blank">awaiting engraving</span>';
   }
   return '<span class="plate-season cut">'+esc(s.season)+' Season</span>'+
-         '<span class="plate-owner cut">'+esc(s.first)+'</span>'+
+         '<span class="plate-owner cut">'+nameHTML(s.first)+'</span>'+
          (s.team?'<span class="plate-team cut">'+esc(s.team)+'</span>':'');
 }
 function line(i,k,label,extra){
@@ -1640,7 +1651,7 @@ function renderRoll(){
       var shown=Math.min(tally[nm],6), pips="";
       for(i=0;i<shown;i++) pips+='<svg class="pip-trophy trophy-icon" viewBox="0 0 200 420" aria-hidden="true"><use href="#miniTrophy"></use></svg>';
       if(tally[nm]>6) pips+='<span class="pip-extra">\u00D7</span>';
-      li.innerHTML='<span class="nm">'+esc(nm)+'</span><span class="pips">'+pips+'</span>';
+      li.innerHTML='<span class="nm">'+nameHTML(nm)+'</span><span class="pips">'+pips+'</span>';
       ul.appendChild(li);
     });
   }
@@ -1650,14 +1661,14 @@ function renderRoll(){
   cellarEl.innerHTML = worst
     ? '<div class="cellar-shame">'+TOMBSTONE_SVG+
       '<div class="cellar-copy"><div class="cellar-label">Most trips to the cellar</div>'+
-      '<div class="cellar-name">'+esc(worst)+'</div>'+
+      '<div class="cellar-name">'+nameHTML(worst)+'</div>'+
       '<div class="cellar-count">'+cellar[worst]+' time'+(cellar[worst]===1?'':'s')+'</div></div></div>'
     : '';
 }
 function updateHolder(){
   var latest=null;
   for(var i=0;i<seasons.length;i++){ if(seasons[i].first){ latest=seasons[i]; break; } }
-  $("holder").textContent=latest?(latest.first+", "+shortSeason(latest.season)+" champ"):"nobody";
+  $("holder").innerHTML=latest?(nameHTML(latest.first)+", "+esc(shortSeason(latest.season))+" champ"):"nobody";
 }
 function shortSeason(s){
   var m=String(s||"").match(/^(\d{4})-(\d{4})$/);
