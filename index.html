@@ -1926,17 +1926,30 @@ var triggerJumpscare=(function(){
     "https://media.tenor.com/80vfPW3pcBcAAAAM/rick-roll.gif",
     "https://media.tenor.com/tez45MQYFYgAAAAM/rickroll-bailu.gif"
   ];
-  var lastMemeIdx=-1, lastKindIdx=-1;
+  var lastKindIdx=-1, memeBag=[], lastMemeUrl=null;
   var JUMPSCARE_KINDS=["horror","funny","chaos"];
   var FUNNY_COLORS=["#F6A6C1","#FFE07A","#8FE3E0","#C7A245","#EFE7D6"];
   var TIMMY_WORDS=["NEVER GONNA GIVE YOU UP!","RICKROLLED!","GOTTEM!"];
   var hideTimer=null, dismissTimer=null, canDismiss=false;
   function hide(){ jc.classList.remove("show"); clearTimeout(hideTimer); }
   jc.addEventListener("click",function(){ if(canDismiss) hide(); });
+  function nextMeme(){
+    if(!memeBag.length){
+      memeBag=MEMES.slice();
+      for(var i=memeBag.length-1;i>0;i--){
+        var j=Math.floor(Math.random()*(i+1));
+        var tmp=memeBag[i]; memeBag[i]=memeBag[j]; memeBag[j]=tmp;
+      }
+      if(lastMemeUrl&&memeBag.length>1&&memeBag[memeBag.length-1]===lastMemeUrl){
+        var swapWith=Math.floor(Math.random()*(memeBag.length-1));
+        var t=memeBag[memeBag.length-1]; memeBag[memeBag.length-1]=memeBag[swapWith]; memeBag[swapWith]=t;
+      }
+    }
+    lastMemeUrl=memeBag.pop();
+    return lastMemeUrl;
+  }
   return function(){
-    var mi; do{ mi=Math.floor(Math.random()*MEMES.length); }while(mi===lastMemeIdx&&MEMES.length>1);
-    lastMemeIdx=mi;
-    img.src=MEMES[mi];
+    img.src=nextMeme();
     var ki; do{ ki=Math.floor(Math.random()*JUMPSCARE_KINDS.length); }while(ki===lastKindIdx&&JUMPSCARE_KINDS.length>1);
     lastKindIdx=ki;
     var kind=JUMPSCARE_KINDS[ki];
