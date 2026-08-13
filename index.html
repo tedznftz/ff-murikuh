@@ -1797,43 +1797,94 @@ function spawnBurst(x,y,count,colors){
     "https://media.tenor.com/0IP9ZfT9W0YAAAAM/holy-fuck-holy-cow.gif",
     "https://media.tenor.com/4WcoXMpfYZoAAAAM/omg-wide-eyed.gif",
     "https://media.tenor.com/FOE-UOxGChIAAAAM/holy-fuck-matty-matheson.gif",
+    "https://media.tenor.com/gGX2hV1fnq4AAAAM/anime-yowamushi-pedal.gif",
     "https://media.tenor.com/ksatu1ueK7IAAAAM/holy-fuck-rudy-ayoub.gif",
     "https://media.tenor.com/5J7IYGVqkjQAAAAM/robert-downey-jr-omg.gif",
     "https://media.tenor.com/V7tMqQdoRCYAAAAM/holy-mother-forking-shirt-balls-oh-no.gif",
     "https://media.tenor.com/VIUHx4sOA5wAAAAM/holy-shit-whats-happening.gif",
-    "https://media.tenor.com/0i9_pzm5ujMAAAAM/bubbles-what-the.gif"
+    "https://media.tenor.com/0i9_pzm5ujMAAAAM/bubbles-what-the.gif",
+    "https://media.tenor.com/x4k88CWIvRIAAAAM/jake-adventure-time.gif",
+    "https://media.tenor.com/tTc5nR0ctbIAAAAM/mha-your-stupid.gif",
+    "https://media.tenor.com/WwUFSgh81FMAAAAM/carlin-george-carlin.gif",
+    "https://media.tenor.com/cTbkqXqu6TQAAAAM/mario-buddies-mario-swearing.gif",
+    "https://media.tenor.com/ikUok-vQATwAAAAM/among-us.gif",
+    "https://media.tenor.com/mRnzDbIAnVAAAAAM/holy-crap-become-the-knight.gif",
+    "https://media.tenor.com/IauaVzjFZigAAAAM/mother-of.gif",
+    "https://media.tenor.com/os4vssTLQZQAAAAM/holy-f-holy-moly.gif",
+    "https://media.tenor.com/z9cG40ltnmAAAAAM/oh-my-god-liz-lemon.gif",
+    "https://media.tenor.com/gaUUrJsFv6MAAAAM/holy-shit-shocked.gif",
+    "https://media.tenor.com/u0bL_xQzOvUAAAAM/buddha.gif",
+    "https://media.tenor.com/yTknBLEFDf0AAAAM/heavy.gif",
+    "https://media.tenor.com/b0s1V1uEQD4AAAAM/anime-nyah.gif",
+    "https://media.tenor.com/doH_yDjDfPYAAAAM/holy-shit.gif",
+    "https://media.tenor.com/xqYA4RMv920AAAAM/holy-fuck-dude-eric-cartman.gif",
+    "https://media.tenor.com/prX5VRpLZBIAAAAM/holy-fuck-fuck-that.gif",
+    "https://media.tenor.com/0pb68DDsuuEAAAAM/low-expectations-sign.gif",
+    "https://media.tenor.com/P9yEKFSx540AAAAM/holy-fuck-emma-meyer.gif",
+    "https://media.tenor.com/Cf0DhC-RlEsAAAAM/oh-no-oh-shit.gif",
+    "https://media.tenor.com/m18XFwcdVb8AAAAM/holy-crap-holy-smokes.gif",
+    "https://media.tenor.com/Mm2qOmnpez8AAAAM/holy-shit-shocked.gif",
+    "https://media.tenor.com/YNWNdryeBRIAAAAM/dumb-and-dumber-jim-carrey.gif",
+    "https://media.tenor.com/ERnghCfRXgkAAAAM/paul-heyman-shocked.gif",
+    "https://media.tenor.com/P2h17mlBI_gAAAAM/goody-drew.gif",
+    "https://media.tenor.com/fpq06Sn8dlQAAAAM/holy-crap-66samus.gif",
+    "https://media.tenor.com/AmPZUio73csAAAAM/museum-meme.gif",
+    "https://media.tenor.com/Xb5nkkccCagAAAAM/holy-fuck-66samus.gif",
+    "https://media.tenor.com/KxRiZ5HMngEAAAAM/severance-dylan-g.gif",
+    "https://media.tenor.com/LReEuEPKyAIAAAAM/the-big-bang-theory-penny-holy-crap-on-a-cracker-shocked-reaction-meme-the-big-bang-theory.gif",
+    "https://media.tenor.com/lk56B7qSYboAAAAM/regular-show-morticai.gif",
+    "https://media.tenor.com/z7fcwDwdGaIAAAAM/epic-family-guy.gif",
+    "https://media.tenor.com/d5xuQ69J7nwAAAAM/sourcegod.gif",
+    "https://media.tenor.com/1LGTMTTVfKAAAAAM/twilight-wednesday.gif"
   ];
-  var DIRS=[{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0},{x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1}];
-  var visible=false, timer=null, lastDirIdx=-1;
+  var DIRS=[
+    {x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0},
+    {x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1},
+    {x:-.4,y:-1},{x:.4,y:-1},{x:-.4,y:1},{x:.4,y:1}
+  ];
+  var visible=false, timer=null, lastDirIdx=-1, lastMemeIdx=-1;
   function pickDir(){
     var idx; do{ idx=Math.floor(Math.random()*DIRS.length); }while(idx===lastDirIdx&&DIRS.length>1);
     lastDirIdx=idx; return DIRS[idx];
+  }
+  function pickMeme(){
+    var idx; do{ idx=Math.floor(Math.random()*MEMES.length); }while(idx===lastMemeIdx&&MEMES.length>1);
+    lastMemeIdx=idx; return MEMES[idx];
+  }
+  function popOne(ox,oy){
+    var jx=(Math.random()*70-35), jy=(Math.random()*50-25);
+    var dir=pickDir(), dist=140+Math.random()*220;
+    var img=document.createElement("img");
+    img.className="meme-pop"; img.alt=""; img.setAttribute("aria-hidden","true");
+    img.src=pickMeme();
+    var size=64+Math.random()*82;
+    img.style.width=size.toFixed(0)+"px";
+    img.style.left=(ox+jx).toFixed(0)+"px";
+    img.style.top=(oy+jy).toFixed(0)+"px";
+    img.style.setProperty("--mx",(dir.x*dist).toFixed(0)+"px");
+    img.style.setProperty("--my",(dir.y*dist).toFixed(0)+"px");
+    img.style.setProperty("--mrot0",(Math.random()*22-11).toFixed(1)+"deg");
+    img.style.setProperty("--mrot1",(Math.random()*60-30).toFixed(1)+"deg");
+    var dur=1.8+Math.random()*.8;
+    img.style.animationDuration=dur.toFixed(2)+"s";
+    gLayer.appendChild(img);
+    setTimeout(function(){ img.remove(); },dur*1000+150);
   }
   function spawn(){
     var r=shot.getBoundingClientRect();
     if(r.width>0){
       var ox=r.left+r.width/2, oy=r.top+r.height*0.4;
-      var dir=pickDir(), dist=150+Math.random()*170;
-      var img=document.createElement("img");
-      img.className="meme-pop"; img.alt=""; img.setAttribute("aria-hidden","true");
-      img.src=MEMES[Math.floor(Math.random()*MEMES.length)];
-      var size=80+Math.random()*50;
-      img.style.width=size.toFixed(0)+"px";
-      img.style.left=ox.toFixed(0)+"px";
-      img.style.top=oy.toFixed(0)+"px";
-      img.style.setProperty("--mx",(dir.x*dist).toFixed(0)+"px");
-      img.style.setProperty("--my",(dir.y*dist).toFixed(0)+"px");
-      img.style.setProperty("--mrot0",(Math.random()*12-6).toFixed(1)+"deg");
-      img.style.setProperty("--mrot1",(Math.random()*30-15).toFixed(1)+"deg");
-      gLayer.appendChild(img);
-      setTimeout(function(){ img.remove(); },2700);
+      var burst=1+Math.floor(Math.random()*3);
+      for(var i=0;i<burst;i++){
+        (function(delay){ setTimeout(function(){ popOne(ox,oy); },delay); })(i*(70+Math.random()*130));
+      }
     }
     schedule();
   }
   function schedule(){
     if(!visible) return;
     clearTimeout(timer);
-    timer=setTimeout(spawn,3400+Math.random()*3600);
+    timer=setTimeout(spawn,900+Math.random()*1600);
   }
   if("IntersectionObserver" in window){
     var io=new IntersectionObserver(function(entries){
