@@ -402,7 +402,10 @@ input{font:inherit}
 
 /* ================= countdowns ================= */
 .clocks{display:grid;grid-template-columns:1fr;gap:18px}
-@media(min-width:640px){.clocks{grid-template-columns:1fr 1fr}}
+@media(min-width:640px){
+  .clocks{grid-template-columns:1fr 1fr}
+  .clocks>*:nth-child(3):last-child{grid-column:1/-1;justify-self:center;width:100%;max-width:calc((100% - 18px)/2)}
+}
 .clock{
   position:relative;overflow:hidden;
   border:1px solid rgba(199,162,69,.3);border-radius:2px;padding:22px 18px 20px;text-align:center;
