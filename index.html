@@ -915,6 +915,18 @@ body.shake{animation:pageShake .42s ease}
   80%{transform:translate(3px,-1px)}
 }
 .glayer{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
+.meme-pop{
+  position:absolute;border-radius:8px;pointer-events:none;
+  box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 0 2px rgba(199,162,69,.45),0 0 26px rgba(246,228,176,.3);
+  opacity:0;animation:memeAwe 2.6s cubic-bezier(.22,.85,.35,1) forwards;
+}
+@keyframes memeAwe{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0deg)}
+  16%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(var(--mrot0,-4deg))}
+  26%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  68%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  100%{opacity:0;transform:translate(calc(-50% + var(--mx,0px)),calc(-50% + var(--my,0px))) scale(.7) rotate(var(--mrot1,10deg))}
+}
 .dust{position:absolute;width:4px;height:4px;border-radius:50%;margin:-2px 0 0 -2px;
   background:#F6E4B0;box-shadow:0 0 6px 2px rgba(246,228,176,.5);
   animation:dustFade .7s ease-out forwards}
@@ -1775,6 +1787,65 @@ function spawnBurst(x,y,count,colors){
     setTimeout(function(){ spawn(); scheduleNext(); },delay);
   }
   scheduleNext();
+})();
+/* ---------- memes react to the trophy in awe, then flee ---------- */
+(function memeAwe(){
+  if(REDUCE) return;
+  var shot=$("shot"),caseEl=document.querySelector(".case"); if(!shot||!caseEl) return;
+  var MEMES=[
+    "https://media.tenor.com/8ssNCp5rVCEAAAAM/ho-lee-fuk-holy-fuck.gif",
+    "https://media.tenor.com/0IP9ZfT9W0YAAAAM/holy-fuck-holy-cow.gif",
+    "https://media.tenor.com/4WcoXMpfYZoAAAAM/omg-wide-eyed.gif",
+    "https://media.tenor.com/FOE-UOxGChIAAAAM/holy-fuck-matty-matheson.gif",
+    "https://media.tenor.com/ksatu1ueK7IAAAAM/holy-fuck-rudy-ayoub.gif",
+    "https://media.tenor.com/5J7IYGVqkjQAAAAM/robert-downey-jr-omg.gif",
+    "https://media.tenor.com/V7tMqQdoRCYAAAAM/holy-mother-forking-shirt-balls-oh-no.gif",
+    "https://media.tenor.com/VIUHx4sOA5wAAAAM/holy-shit-whats-happening.gif",
+    "https://media.tenor.com/0i9_pzm5ujMAAAAM/bubbles-what-the.gif"
+  ];
+  var DIRS=[{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0},{x:-1,y:-1},{x:1,y:-1},{x:-1,y:1},{x:1,y:1}];
+  var visible=false, timer=null, lastDirIdx=-1;
+  function pickDir(){
+    var idx; do{ idx=Math.floor(Math.random()*DIRS.length); }while(idx===lastDirIdx&&DIRS.length>1);
+    lastDirIdx=idx; return DIRS[idx];
+  }
+  function spawn(){
+    var r=shot.getBoundingClientRect();
+    if(r.width>0){
+      var ox=r.left+r.width/2, oy=r.top+r.height*0.4;
+      var dir=pickDir(), dist=150+Math.random()*170;
+      var img=document.createElement("img");
+      img.className="meme-pop"; img.alt=""; img.setAttribute("aria-hidden","true");
+      img.src=MEMES[Math.floor(Math.random()*MEMES.length)];
+      var size=80+Math.random()*50;
+      img.style.width=size.toFixed(0)+"px";
+      img.style.left=ox.toFixed(0)+"px";
+      img.style.top=oy.toFixed(0)+"px";
+      img.style.setProperty("--mx",(dir.x*dist).toFixed(0)+"px");
+      img.style.setProperty("--my",(dir.y*dist).toFixed(0)+"px");
+      img.style.setProperty("--mrot0",(Math.random()*12-6).toFixed(1)+"deg");
+      img.style.setProperty("--mrot1",(Math.random()*30-15).toFixed(1)+"deg");
+      gLayer.appendChild(img);
+      setTimeout(function(){ img.remove(); },2700);
+    }
+    schedule();
+  }
+  function schedule(){
+    if(!visible) return;
+    clearTimeout(timer);
+    timer=setTimeout(spawn,3400+Math.random()*3600);
+  }
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        visible=en.isIntersecting;
+        if(visible) schedule(); else clearTimeout(timer);
+      });
+    },{threshold:.35});
+    io.observe(shot);
+  }else{
+    visible=true; schedule();
+  }
 })();
 function voteToss(el){
   if(REDUCE||!el) return;
