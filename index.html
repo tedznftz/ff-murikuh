@@ -424,6 +424,10 @@ input{font:inherit}
 .clock.urgent{border-color:rgba(199,120,69,.55)}
 .clock.urgent .clock-time .num{color:#F0B79A;animation:urgentPulse 1.1s ease-in-out infinite}
 @keyframes urgentPulse{0%,100%{opacity:1}50%{opacity:.5}}
+.clock-tbd{
+  margin-top:16px;font-family:var(--cut);font-weight:700;font-size:clamp(26px,7vw,34px);letter-spacing:.06em;
+  color:#E8D9AE;text-shadow:0 1px 0 rgba(255,255,255,.15),0 -1px 2px rgba(0,0,0,.6);position:relative;z-index:1
+}
 
 /* -- draft night: war-room spotlight sweeping over a dashed ticket edge -- */
 .clock--draft{border-top:2px dashed rgba(199,162,69,.45)}
@@ -442,17 +446,6 @@ input{font:inherit}
   content:"";position:absolute;top:-25%;left:50%;width:75%;height:75%;pointer-events:none;
   transform:translateX(-50%);background:radial-gradient(circle,rgba(255,250,220,.16),transparent 70%);
 }
-
-/* -- nfl trade deadline: ticking, alarmed -- */
-.clock--trade{border:1px solid rgba(154,50,50,.45);border-top:2px solid rgba(200,90,80,.5)}
-.clock--trade .clock-label{color:#E29E90}
-.clock--trade .clock-time .num{color:#F3D9D2}
-.clock--trade::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(70% 60% at 50% 0%,rgba(180,40,40,.14),transparent 72%);
-  animation:tradePulse 2.6s ease-in-out infinite;
-}
-@keyframes tradePulse{0%,100%{opacity:.6}50%{opacity:1}}
 
 /* -- fantasy playoffs: climbing toward the trophy -- */
 .clock--playoffs{border-color:rgba(199,162,69,.55)}
@@ -1199,7 +1192,7 @@ body.shake{animation:pageShake .42s ease}
     <p>The key dates, ticking down.</p>
   </div>
   <div class="clocks">
-    <div class="clock clock--draft" id="clockDraft" data-cal-title="FF Murikuh — Draft Night" data-cal-desc="League draft night." data-cal-hours="3">
+    <div class="clock clock--draft" id="clockDraft">
       <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
         <rect x="6" y="4" width="20" height="26" rx="2" fill="#2E2015" stroke="#C7A245" stroke-width="1.2"/>
         <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#C7A245"/>
@@ -1208,17 +1201,8 @@ body.shake{animation:pageShake .42s ease}
         <line x1="10" y1="23" x2="18" y2="23" stroke="#C7A245" stroke-width="1.3" opacity=".8"/>
       </svg>
       <div class="clock-label">Draft Night</div>
-      <div class="clock-time">
-        <div class="unit"><span class="num" data-u="d">00</span><span class="lbl">Days</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="h">00</span><span class="lbl">Hrs</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="m">00</span><span class="lbl">Min</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="s">00</span><span class="lbl">Sec</span></div>
-      </div>
-      <div class="clock-note">Placeholder date — update once it's locked in</div>
-      <button type="button" class="link clock-cal" style="margin-top:12px">+ Add to Calendar</button>
+      <div class="clock-tbd">TBD</div>
+      <div class="clock-note">Date and time not set — see availability below</div>
     </div>
     <div class="clock clock--kickoff" id="clockSeason" data-cal-title="FF Murikuh — Season Kickoff" data-cal-desc="NFL season opener: New England Patriots @ Seattle Seahawks, NBC." data-cal-hours="3.5">
       <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
@@ -1243,26 +1227,6 @@ body.shake{animation:pageShake .42s ease}
       <div class="clock-game">New England Patriots @ Seattle Seahawks<br>Wed, Sep 9 · 8:20 PM ET · NBC</div>
       <button type="button" class="link clock-cal" style="margin-top:12px">+ Add to Calendar</button>
     </div>
-    <div class="clock clock--trade" id="clockTrade" data-cal-title="FF Murikuh — NFL Trade Deadline" data-cal-desc="NFL in-season trade deadline." data-cal-hours="1">
-      <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
-        <rect x="8" y="3" width="16" height="3" rx="1" fill="#9B4033"/>
-        <rect x="8" y="26" width="16" height="3" rx="1" fill="#9B4033"/>
-        <path d="M9 6 H23 C23 13 18 14.5 16 16 C18 17.5 23 19 23 26 H9 C9 19 14 17.5 16 16 C14 14.5 9 13 9 6 Z" fill="none" stroke="#C97A6A" stroke-width="1.4"/>
-        <path d="M12 8.5 C12 11.5 14 13 16 15 C18 13 20 11.5 20 8.5 Z" fill="#C97A6A" opacity=".65"/>
-      </svg>
-      <div class="clock-label">NFL Trade Deadline</div>
-      <div class="clock-time">
-        <div class="unit"><span class="num" data-u="d">00</span><span class="lbl">Days</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="h">00</span><span class="lbl">Hrs</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="m">00</span><span class="lbl">Min</span></div>
-        <span class="clock-sep">:</span>
-        <div class="unit"><span class="num" data-u="s">00</span><span class="lbl">Sec</span></div>
-      </div>
-      <div class="clock-game">Tue, Nov 10 · 4:00 PM ET</div>
-      <button type="button" class="link clock-cal" style="margin-top:12px">+ Add to Calendar</button>
-    </div>
     <div class="clock clock--playoffs" id="clockPlayoffs" data-cal-title="FF Murikuh — Fantasy Playoffs" data-cal-desc="League fantasy playoffs begin." data-cal-hours="3">
       <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
         <g fill="none" stroke="#C7A245" stroke-width="2" stroke-linecap="round">
@@ -1282,7 +1246,7 @@ body.shake{animation:pageShake .42s ease}
         <span class="clock-sep">:</span>
         <div class="unit"><span class="num" data-u="s">00</span><span class="lbl">Sec</span></div>
       </div>
-      <div class="clock-note">Placeholder date — update once your league sets the week</div>
+      <div class="clock-note">Fantasy playoffs run NFL weeks 15–17</div>
       <button type="button" class="link clock-cal" style="margin-top:12px">+ Add to Calendar</button>
     </div>
   </div>
@@ -1976,12 +1940,8 @@ var triggerJumpscare=(function(){
 /* ---------- countdowns: draft night, kickoff, trade deadline, fantasy playoffs ---------- */
 (function countdowns(){
   var CFG=[
-    {id:"clockDraft", when:new Date(2026,7,29,19,0,0),
-     donemsg:"Draft night is here."},
     {id:"clockSeason", when:new Date("2026-09-09T20:20:00-04:00"),
      donemsg:"Kickoff — the season is live."},
-    {id:"clockTrade", when:new Date("2026-11-10T16:00:00-05:00"),
-     donemsg:"The trade deadline has passed."},
     {id:"clockPlayoffs", when:new Date(2026,11,17,20,0,0),
      donemsg:"The fantasy playoffs have begun."}
   ];
@@ -2000,10 +1960,6 @@ var triggerJumpscare=(function(){
           msg.className="clock-done-msg";
           msg.textContent=c.donemsg;
           el.appendChild(msg);
-          if(c.id==="clockDraft"&&!draftPassed){
-            draftPassed=true;
-            if(seasons.length) renderPlates();
-          }
         }
         return;
       }
