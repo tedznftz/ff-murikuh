@@ -2542,16 +2542,9 @@ function renderAvailability(){
     });
   });
   var notice=$("availNotice");
-  if(notice){
-    notice.innerHTML=session
-      ? '<p class="avail-hint">Check every time you can make it, X the ones you can’t — you can change this anytime before the draft.</p>'
-      : '<p class="avail-hint">You need to log in before you can mark your availability.</p>'+
-        '<button type="button" class="btn" id="btnJumpLogin">Log in above &uarr;</button>';
-    if(!session){
-      var jump=$("btnJumpLogin");
-      if(jump) jump.addEventListener("click",function(){ scrollToId("authCard"); });
-    }
-  }
+  if(notice) notice.innerHTML=session
+    ? '<p class="avail-hint">Check every time you can make it, X the ones you can’t — you can change this anytime before the draft.</p>'
+    : "";
   renderSummary();
 }
 function renderSummary(){
