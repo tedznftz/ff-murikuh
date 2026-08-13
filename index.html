@@ -582,6 +582,14 @@ input{font:inherit}
 .line.small input{font-family:var(--body);font-weight:400;font-size:14px;letter-spacing:.01em;text-transform:none}
 .line input::placeholder{font-family:var(--body);font-style:italic;font-weight:300;text-transform:none;letter-spacing:0;color:rgba(76,58,16,.42);text-shadow:none}
 .line input:focus{outline:0;border-bottom-color:rgba(76,58,16,.7);background:rgba(76,58,16,.06)}
+.line-name{
+  width:100%;padding:4px 2px;
+  font-family:var(--cut);font-weight:600;font-size:16px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--etch);text-shadow:0 1px 0 rgba(255,255,255,.5),0 -1px 1px rgba(0,0,0,.28);
+  border-bottom:1px solid rgba(76,58,16,.22);
+}
+.line.small .line-name{font-family:var(--body);font-weight:400;font-size:14px;letter-spacing:.01em;text-transform:none}
+.line-empty{font-family:var(--body);font-style:italic;font-weight:300;text-transform:none;letter-spacing:0;color:rgba(76,58,16,.42);text-shadow:none}
 
 /* ================= roll of honour ================= */
 .honour{position:relative}
@@ -1560,11 +1568,11 @@ function renderPlates(){
     var drawer=document.createElement("div");
     drawer.className="drawer";
     drawer.innerHTML='<div class="drawer-in"><div class="engrave">'+
-      line(i,"first","Champion","")+
+      line(i,"first","Champion","",true)+
       line(i,"team","Team name","")+
-      line(i,"second","Runner-up","")+
-      line(i,"third","Third","")+
-      line(i,"last","Last place"," small")+
+      line(i,"second","Runner-up","",true)+
+      line(i,"third","Third","",true)+
+      line(i,"last","Last place"," small",true)+
       line(i,"score","Title game"," small")+
     '</div></div>';
 
@@ -1616,11 +1624,17 @@ function plateFace(s){
          '<span class="plate-owner cut">'+nameHTML(s.first)+'</span>'+
          (s.team?'<span class="plate-team cut">'+esc(s.team)+'</span>':'');
 }
-function line(i,k,label,extra){
+function line(i,k,label,extra,isName){
   var ph=k==="score"?"e.g. 142.6 – 118.3":k==="last"?"who paid for the draft":
          k==="team"?"team name that season":"name";
+  var val=seasons[i][k]||"";
+  if(isName&&!ADMIN){
+    var display=val?nameHTML(val):'<span class="line-empty">'+esc(ph)+'</span>';
+    return '<div class="line'+(extra||"")+'"><span>'+label+'</span>'+
+      '<div class="line-name" aria-label="'+label+', '+seasons[i].season+' season">'+display+'</div></div>';
+  }
   return '<div class="line'+(extra||"")+'"><span>'+label+'</span>'+
-    '<input'+(ADMIN?"":" readonly")+' data-i="'+i+'" data-k="'+k+'" value="'+esc(seasons[i][k]||"")+'" placeholder="'+ph+'" aria-label="'+label+', '+seasons[i].season+' season"></div>';
+    '<input'+(ADMIN?"":" readonly")+' data-i="'+i+'" data-k="'+k+'" value="'+esc(val)+'" placeholder="'+ph+'" aria-label="'+label+', '+seasons[i].season+' season"></div>';
 }
 
 /* ---------- roll of honour ---------- */
