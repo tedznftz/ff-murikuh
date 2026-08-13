@@ -890,7 +890,14 @@ input{font:inherit}
 .auth-box input[type=email]::placeholder,.auth-box input[type=text]::placeholder{color:rgba(183,172,150,.45);font-style:italic}
 .auth-box .who{font-size:14.5px;color:var(--ivory-dim)}
 .auth-box .who strong{color:var(--ivory);font-weight:500}
+.auth-box .btn{
+  color:#2E2308;border-color:transparent;
+  background:linear-gradient(168deg,var(--brass-hi) 0%,var(--brass) 34%,var(--brass-lo) 66%,var(--brass) 100%);
+  box-shadow:0 3px 0 rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,240,200,.35);
+}
+.auth-box .btn:hover{background:linear-gradient(168deg,var(--brass-hi) 0%,var(--brass) 34%,var(--brass-lo) 66%,var(--brass) 100%);color:#2E2308}
 .auth-msg{flex:1 1 100%;font-size:13.5px;color:var(--ivory-dim);font-style:italic}
+.auth-msg strong{color:var(--ivory);font-weight:600;font-style:normal}
 .auth-msg.err{color:#E2A99A}
 .meter{height:6px;background:rgba(255,255,255,.08);border-radius:8px;margin-top:14px;overflow:hidden;position:relative}
 .meter i{position:absolute;top:0;bottom:0;left:0;background:#5A7A4E;transition:width .3s;overflow:hidden}
@@ -2424,7 +2431,7 @@ function renderAuth(){
   if(title) title.textContent="Log in to vote";
   box.innerHTML='<input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" aria-label="Email">'+
     '<button class="btn" id="btnSendLink" type="button">Send code</button>'+
-    '<span class="auth-msg" id="authMsg">Owners get an email with a login link and an 8-digit code — click the link or type the code, whichever’s easier.</span>';
+    '<span class="auth-msg" id="authMsg">Owners get an email from <strong>noreply@murikuh.xyz</strong> with a login link and an 8-digit code — click the link or type the code, whichever’s easier. Check spam if you don’t see it.</span>';
   var send=function(){
     var email=$("authEmail").value.trim();
     var msg=$("authMsg");
