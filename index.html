@@ -851,7 +851,9 @@ input{font:inherit}
 .avail-choice:disabled{cursor:not-allowed;opacity:.4}
 .avail-choice.yes.active{background:#5A7A4E;border-color:#5A7A4E;color:#F3ECDC}
 .avail-choice.no.active{background:#9B4033;border-color:#9B4033;color:#F3ECDC}
-.avail-hint{margin-top:20px;text-align:center;font-size:14px;color:var(--ivory-dim);font-style:italic}
+.avail-notice{text-align:center;margin-bottom:24px}
+.avail-hint{margin:0 0 12px;text-align:center;font-size:14px;color:var(--ivory-dim);font-style:italic}
+.avail-notice .avail-hint:last-child{margin-bottom:0}
 .tally-grid{display:grid;gap:22px}
 @media(min-width:640px){.tally-grid{grid-template-columns:1fr 1fr}}
 .tally-card{
@@ -1310,7 +1312,7 @@ body.shake{animation:pageShake .42s ease}
     <div class="vote-status" id="voteStatus"></div>
   </div>
 
-  <div class="auth-card">
+  <div class="auth-card" id="authCard">
     <h3 class="auth-card-title" id="authCardTitle">Log in to vote</h3>
     <div class="auth-box" id="authBox"></div>
   </div>
@@ -1337,8 +1339,8 @@ body.shake{animation:pageShake .42s ease}
     <p>Mark every start time you could make it — whichever slot has the most overlap wins.</p>
   </div>
 
+  <div class="avail-notice" id="availNotice"></div>
   <div class="avail-grid" id="availGrid"></div>
-  <p class="avail-hint" id="availHint"></p>
 </section>
 
 <!-- ================= the tally ================= -->
@@ -1418,6 +1420,14 @@ body.shake{animation:pageShake .42s ease}
    boot                      — loads storage, kicks everything off
    ========================================== */
 var $=function(id){return document.getElementById(id)};
+function scrollToId(id){
+  var target=document.getElementById(id); if(!target) return;
+  var nav=$("wayfinder");
+  var offset=(nav?nav.getBoundingClientRect().height:0)+56;
+  var y=target.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top:Math.max(y,0),behavior:REDUCE?"auto":"smooth"});
+  history.pushState(null,"","#"+id);
+}
 
 /* ---------- voting backend (Supabase) ---------- */
 var SUPABASE_URL="https://vzxeucujtkkynocjkdqt.supabase.co";
@@ -1695,12 +1705,10 @@ var armPlates=(function(){
   var nav=$("wayfinder"); if(!nav) return;
   Array.prototype.forEach.call(nav.querySelectorAll("a[href^='#']"),function(a){
     a.addEventListener("click",function(e){
-      var id=a.getAttribute("href").slice(1), target=document.getElementById(id);
-      if(!target) return;
+      var id=a.getAttribute("href").slice(1);
+      if(!document.getElementById(id)) return;
       e.preventDefault();
-      var y=target.getBoundingClientRect().top+window.scrollY-(nav.getBoundingClientRect().height+56);
-      window.scrollTo({top:Math.max(y,0),behavior:REDUCE?"auto":"smooth"});
-      history.pushState(null,"","#"+id);
+      scrollToId(id);
     });
   });
 })();
@@ -2473,10 +2481,17 @@ function renderAvailability(){
       btn.addEventListener("click",function(){ setAvailSlot(btn.dataset.slot,btn.dataset.choice); });
     });
   });
-  var hint=$("availHint");
-  if(hint) hint.textContent=session
-    ? "Check every time you can make it, X the ones you can't — you can change this anytime before the draft."
-    : "Log in above (under On the Floor) to mark your availability.";
+  var notice=$("availNotice");
+  if(notice){
+    notice.innerHTML=session
+      ? '<p class="avail-hint">Check every time you can make it, X the ones you can’t — you can change this anytime before the draft.</p>'
+      : '<p class="avail-hint">You need to log in before you can mark your availability.</p>'+
+        '<button type="button" class="btn" id="btnJumpLogin">Log in above &uarr;</button>';
+    if(!session){
+      var jump=$("btnJumpLogin");
+      if(jump) jump.addEventListener("click",function(){ scrollToId("authCard"); });
+    }
+  }
   renderSummary();
 }
 function renderSummary(){
