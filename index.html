@@ -921,16 +921,19 @@ body.shake{animation:pageShake .42s ease}
 }
 .login-toast{
   position:fixed;left:50%;bottom:22px;z-index:9997;
-  display:flex;align-items:center;gap:14px;max-width:min(420px,92vw);
+  display:flex;flex-direction:column;align-items:center;gap:12px;width:min(340px,92vw);
   background:linear-gradient(180deg,#2A2013,#1A1409);
-  border:1px solid rgba(199,162,69,.5);border-radius:4px;padding:14px 14px 14px 18px;
+  border:1px solid rgba(199,162,69,.5);border-radius:4px;padding:18px 20px 16px;text-align:center;
   box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 1px rgba(255,240,200,.06);
   opacity:0;transform:translate(-50%,16px);transition:opacity .35s ease,transform .35s ease;
 }
 .login-toast.show{opacity:1;transform:translate(-50%,0)}
-.login-toast span{font-size:13.5px;line-height:1.4;color:var(--ivory);flex:1 1 auto}
-.login-toast .btn{flex:0 0 auto;white-space:nowrap}
-.login-toast-x{background:transparent;border:0;color:var(--ivory-dim);font-size:20px;line-height:1;cursor:pointer;padding:0 2px;flex:0 0 auto}
+.login-toast span{font-size:13.5px;line-height:1.4;color:var(--ivory)}
+.login-toast .btn{width:100%}
+.login-toast-x{
+  position:absolute;top:8px;right:10px;
+  background:transparent;border:0;color:var(--ivory-dim);font-size:20px;line-height:1;cursor:pointer;padding:4px;
+}
 .login-toast-x:hover{color:var(--ivory)}
 @media(prefers-reduced-motion:reduce){.login-toast{transition:opacity .2s ease}}
 .glayer{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
