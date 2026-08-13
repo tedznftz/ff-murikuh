@@ -919,6 +919,20 @@ body.shake{animation:pageShake .42s ease}
   60%{transform:translate(-3px,1px)}
   80%{transform:translate(3px,-1px)}
 }
+.login-toast{
+  position:fixed;left:50%;bottom:22px;z-index:9997;
+  display:flex;align-items:center;gap:14px;max-width:min(420px,92vw);
+  background:linear-gradient(180deg,#2A2013,#1A1409);
+  border:1px solid rgba(199,162,69,.5);border-radius:4px;padding:14px 14px 14px 18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.55),0 0 0 1px rgba(255,240,200,.06);
+  opacity:0;transform:translate(-50%,16px);transition:opacity .35s ease,transform .35s ease;
+}
+.login-toast.show{opacity:1;transform:translate(-50%,0)}
+.login-toast span{font-size:13.5px;line-height:1.4;color:var(--ivory);flex:1 1 auto}
+.login-toast .btn{flex:0 0 auto;white-space:nowrap}
+.login-toast-x{background:transparent;border:0;color:var(--ivory-dim);font-size:20px;line-height:1;cursor:pointer;padding:0 2px;flex:0 0 auto}
+.login-toast-x:hover{color:var(--ivory)}
+@media(prefers-reduced-motion:reduce){.login-toast{transition:opacity .2s ease}}
 .glayer{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
 .meme-pop{
   position:absolute;border-radius:8px;pointer-events:none;
@@ -1711,6 +1725,44 @@ var armPlates=(function(){
       scrollToId(id);
     });
   });
+})();
+
+/* ---------- nudge: toast if you scroll past login while logged out ---------- */
+(function loginNudge(){
+  var card=$("authCard"); if(!card) return;
+  var toast=null, timer=null, shown=false, dismissed=false;
+  function hideToast(){
+    dismissed=true; clearTimeout(timer);
+    if(!toast) return;
+    toast.classList.remove("show");
+    setTimeout(function(){ if(toast){ toast.remove(); toast=null; } },400);
+  }
+  function buildToast(){
+    toast=document.createElement("div");
+    toast.className="login-toast";
+    toast.innerHTML='<span>You’re not logged in yet — vote and mark availability once you are.</span>'+
+      '<button type="button" class="btn" id="loginToastGo">Log in</button>'+
+      '<button type="button" class="login-toast-x" aria-label="Dismiss">&times;</button>';
+    document.body.appendChild(toast);
+    requestAnimationFrame(function(){ toast.classList.add("show"); });
+    $("loginToastGo").addEventListener("click",function(){ scrollToId("authCard"); hideToast(); });
+    toast.querySelector(".login-toast-x").addEventListener("click",hideToast);
+  }
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(shown||dismissed||session) return;
+        if(!en.isIntersecting&&en.boundingClientRect.top<0){
+          if(!timer) timer=setTimeout(function(){
+            if(!session&&!dismissed&&!shown){ shown=true; buildToast(); }
+          },3000);
+        }else{
+          clearTimeout(timer); timer=null;
+        }
+      });
+    },{threshold:0});
+    io.observe(card);
+  }
 })();
 
 /* ---------- ambient sparkle motes drifting past the trophy ---------- */
