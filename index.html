@@ -929,7 +929,12 @@ body.shake{animation:pageShake .42s ease}
 }
 .login-toast.show{opacity:1;transform:translate(-50%,0)}
 .login-toast span{font-size:13.5px;line-height:1.4;color:var(--ivory)}
-.login-toast .btn{width:100%}
+.login-toast .btn{
+  width:100%;color:#2E2308;border-color:transparent;
+  background:linear-gradient(168deg,var(--brass-hi) 0%,var(--brass) 34%,var(--brass-lo) 66%,var(--brass) 100%);
+  box-shadow:0 3px 0 rgba(0,0,0,.45),0 8px 14px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,240,200,.35);
+}
+.login-toast .btn:hover{background:linear-gradient(168deg,var(--brass-hi) 0%,var(--brass) 34%,var(--brass-lo) 66%,var(--brass) 100%);color:#2E2308}
 .login-toast-x{
   position:absolute;top:8px;right:10px;
   background:transparent;border:0;color:var(--ivory-dim);font-size:20px;line-height:1;cursor:pointer;padding:4px;
