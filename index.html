@@ -2689,6 +2689,10 @@ function pick(head,keys){
   return -1;
 }
 function ingest(text,label){
+  if(votingPhase()!=="upcoming"){
+    say("Voting has already started — the floor is locked, so new form submissions aren't being pulled in this cycle.","err");
+    return;
+  }
   var rows=parseCSV(text);
   if(rows.length<2) throw new Error("Nothing in there yet \u2014 no submissions on that sheet.");
   var head=rows[0],
@@ -2764,10 +2768,9 @@ $("btnLoadPaste").addEventListener("click",function(){
   try{ ingest(v,"pasted data"); }catch(e){ say(e.message,"err"); }
 });
 
-/* ---------- rule suggestion deadline ---------- */
+/* ---------- rule suggestions close the moment voting goes live ---------- */
 (function suggestDeadline(){
-  var DEADLINE=new Date("2026-08-16T03:59:59Z"); /* 11:59:59 PM ET, Saturday, August 15 */
-  if(Date.now()<=DEADLINE.getTime()) return;
+  if(votingPhase()==="upcoming") return;
   Array.prototype.forEach.call(document.querySelectorAll(".suggest-link"),function(a){
     a.classList.add("closed");
     a.textContent="Submissions Closed";
