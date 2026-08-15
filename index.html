@@ -2332,9 +2332,8 @@ var SEED_FLOOR=[
    desc:"Part 1 (pick one) \u2014 what defines a \u201Closer\u201D?\n\u203A Whoever has the worst record at the end of week 14?\n\u203A Whoever has the worst record at the very end?\n\nIf the latter, then Part 2 (yes or no):\n\u203A At the start of week 15 / the playoffs, those not in the playoffs cannot touch the waiver wire, but are welcome to pick from free agents after the fact.",
    why:"We never really decided what \u201Closer\u201D actually meant.",note:""}
 ];
-/* voting window: 12:00 AM ET Monday Aug 17 through 11:59:59 PM ET Saturday Aug 22, 2026 */
-/* voting window: 12:00 AM ET Monday Aug 17 through 11:59:59 PM ET Saturday Aug 22, 2026 */
-var VOTE_OPEN=new Date("2026-08-17T04:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T03:59:59Z");
+/* voting window: 12:00 AM ET Sunday Aug 16 through 11:59:59 PM ET Saturday Aug 22, 2026 */
+var VOTE_OPEN=new Date("2026-08-16T04:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T03:59:59Z");
 function votingPhase(){
   var now=Date.now();
   if(now<VOTE_OPEN.getTime()) return "upcoming";
@@ -2345,7 +2344,7 @@ function renderVoteStatus(){
   var el=$("voteStatus"); if(!el) return;
   var phase=votingPhase();
   var msg={
-    upcoming:"Voting opens Monday, August 17",
+    upcoming:"Voting opens Sunday, August 16",
     open:"Voting is open — closes Saturday, August 22, 11:59 PM ET",
     closed:"Voting is closed"
   }[phase];
@@ -2577,7 +2576,7 @@ function makeVoteBtn(pid,choice,label){
   b.textContent=label;
   var phase=votingPhase();
   b.disabled=!session||phase!=="open";
-  b.title=!session?"Log in above to vote":phase==="upcoming"?"Voting opens Monday, August 17":phase==="closed"?"Voting has closed":"";
+  b.title=!session?"Log in above to vote":phase==="upcoming"?"Voting opens Sunday, August 16":phase==="closed"?"Voting has closed":"";
   b.addEventListener("click",function(){
     if(myVotes[pid]!==choice) voteToss(b);
     castVote(pid,choice);
