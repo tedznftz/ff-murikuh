@@ -2693,11 +2693,16 @@ function pick(head,keys){
     for(var j=0;j<keys.length;j++) if(h.indexOf(keys[j])>-1) return i; }
   return -1;
 }
+/* Google's default timestamp format, "M/D/YYYY H:MM:SS" with no zone — parsed as ET explicitly
+   so the deadline filter below doesn't depend on the visiting browser's local timezone */
+function parseSheetTimeET(s){
+  var m=String(s||"").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
+  if(!m) return null;
+  function p2(n){ n=String(n); return n.length<2?"0"+n:n; }
+  var dt=new Date(m[3]+"-"+p2(m[1])+"-"+p2(m[2])+"T"+p2(m[4])+":"+m[5]+":"+m[6]+"-04:00");
+  return isNaN(dt.getTime())?null:dt;
+}
 function ingest(text,label){
-  if(votingPhase()!=="upcoming"){
-    say("Voting has already started — the floor is locked, so new form submissions aren't being pulled in this cycle.","err");
-    return;
-  }
   var rows=parseCSV(text);
   if(rows.length<2) throw new Error("Nothing in there yet \u2014 no submissions on that sheet.");
   var head=rows[0],
@@ -2705,9 +2710,18 @@ function ingest(text,label){
       iTitle=pick(head,["rule title","title","rule"]),
       iDesc=pick(head,["describe","description","what"]),
       iWhy=pick(head,["why","reason"]),
-      iNote=pick(head,["note","anything else","other"]);
+      iNote=pick(head,["note","anything else","other"]),
+      iTime=pick(head,["timestamp"]);
   if(iTitle<0&&iDesc<0) throw new Error("Couldn't find a rule column. The sheet needs a Rule Title or Description header.");
-  var pulled=rows.slice(1).map(function(r,n){
+  var SUBMIT_DEADLINE=new Date("2026-08-16T03:59:59Z"); /* 11:59:59 PM ET, Saturday, August 15 */
+  var body=rows.slice(1);
+  if(iTime>-1){
+    body=body.filter(function(r){
+      var t=parseSheetTimeET(r[iTime]);
+      return !t||t.getTime()<=SUBMIT_DEADLINE.getTime();
+    });
+  }
+  var pulled=body.map(function(r,n){
     return{id:"s"+n,src:"sheet",
       owner:(iName>-1?r[iName]:"")||"Anonymous",
       title:(iTitle>-1?r[iTitle]:"")||("Submission "+(n+1)),
