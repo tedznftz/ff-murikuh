@@ -430,10 +430,6 @@ input{font:inherit}
 .clock.urgent{border-color:rgba(199,120,69,.55)}
 .clock.urgent .clock-time .num{color:#F0B79A;animation:urgentPulse 1.1s ease-in-out infinite}
 @keyframes urgentPulse{0%,100%{opacity:1}50%{opacity:.5}}
-.clock-tbd{
-  margin-top:16px;font-family:var(--cut);font-weight:700;font-size:clamp(26px,7vw,34px);letter-spacing:.06em;
-  color:#E8D9AE;text-shadow:0 1px 0 rgba(255,255,255,.15),0 -1px 2px rgba(0,0,0,.6);position:relative;z-index:1
-}
 
 /* -- draft night: war-room spotlight sweeping over a dashed ticket edge -- */
 .clock--draft{border-top:2px dashed rgba(199,162,69,.45)}
@@ -768,6 +764,7 @@ input{font:inherit}
   font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(199,162,69,.4);
 }
 .link:hover{color:#F0E2B8}
+.archive-toggle{display:block;width:fit-content;margin:0 auto 18px}
 .tuck{margin-top:22px}
 .tuck .paper{margin-top:14px}
 .prop-strike{background:transparent;border:0;color:rgba(200,193,178,.45);font-family:var(--ui);font-weight:600;font-size:10.5px;
@@ -1247,7 +1244,7 @@ body.shake{animation:pageShake .42s ease}
     <p>The key dates, ticking down.</p>
   </div>
   <div class="clocks">
-    <div class="clock clock--draft" id="clockDraft">
+    <div class="clock clock--draft" id="clockDraft" data-cal-title="FF Murikuh — Draft Night" data-cal-desc="FF Murikuh league draft." data-cal-hours="3">
       <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
         <rect x="6" y="4" width="20" height="26" rx="2" fill="#2E2015" stroke="#C7A245" stroke-width="1.2"/>
         <rect x="11" y="2" width="10" height="5" rx="1.5" fill="#C7A245"/>
@@ -1256,8 +1253,17 @@ body.shake{animation:pageShake .42s ease}
         <line x1="10" y1="23" x2="18" y2="23" stroke="#C7A245" stroke-width="1.3" opacity=".8"/>
       </svg>
       <div class="clock-label">Draft Night</div>
-      <div class="clock-tbd">TBD</div>
-      <div class="clock-note">Date and time not set — see availability below</div>
+      <div class="clock-time">
+        <div class="unit"><span class="num" data-u="d">00</span><span class="lbl">Days</span></div>
+        <span class="clock-sep">:</span>
+        <div class="unit"><span class="num" data-u="h">00</span><span class="lbl">Hrs</span></div>
+        <span class="clock-sep">:</span>
+        <div class="unit"><span class="num" data-u="m">00</span><span class="lbl">Min</span></div>
+        <span class="clock-sep">:</span>
+        <div class="unit"><span class="num" data-u="s">00</span><span class="lbl">Sec</span></div>
+      </div>
+      <div class="clock-note">Monday, Sept 7 · 7:00 PM ET</div>
+      <button type="button" class="link clock-cal" style="margin-top:12px">+ Add to Calendar</button>
     </div>
     <div class="clock clock--kickoff" id="clockSeason" data-cal-title="FF Murikuh — Season Kickoff" data-cal-desc="NFL season opener: New England Patriots @ Seattle Seahawks, NBC." data-cal-hours="3.5">
       <svg class="clock-icon" viewBox="0 0 32 32" aria-hidden="true">
@@ -1350,7 +1356,7 @@ body.shake{animation:pageShake .42s ease}
     <div class="vote-status" id="voteStatus"></div>
   </div>
 
-  <button class="link" id="btnFloorArchive" type="button" aria-expanded="false">Show the 2026-2027 floor archive</button>
+  <button class="link archive-toggle" id="btnFloorArchive" type="button" aria-expanded="false">Show the 2026-2027 floor archive</button>
 
   <div id="floorArchive" hidden>
     <div class="auth-card" id="authCard">
@@ -1382,7 +1388,7 @@ body.shake{animation:pageShake .42s ease}
     <div class="vote-status" id="draftVoteStatus"></div>
   </div>
 
-  <button class="link" id="btnDraftArchive" type="button" aria-expanded="false">Show the 2026-2027 draft availability archive</button>
+  <button class="link archive-toggle" id="btnDraftArchive" type="button" aria-expanded="false">Show the 2026-2027 draft availability archive</button>
 
   <div id="draftArchive" hidden>
     <div class="avail-notice" id="availNotice"></div>
@@ -2110,6 +2116,8 @@ var triggerJumpscare=(function(){
 /* ---------- countdowns: draft night, kickoff, trade deadline, fantasy playoffs ---------- */
 (function countdowns(){
   var CFG=[
+    {id:"clockDraft", when:new Date("2026-09-07T19:00:00-04:00"),
+     donemsg:"The draft is underway."},
     {id:"clockSeason", when:new Date("2026-09-09T20:20:00-04:00"),
      donemsg:"Kickoff — the season is live."},
     {id:"clockPlayoffs", when:new Date(2026,11,17,20,0,0),
