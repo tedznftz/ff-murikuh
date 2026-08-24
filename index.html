@@ -1403,20 +1403,24 @@ body.shake{animation:pageShake .42s ease}
     <p>Where the floor and the draft scheduling stand right now.</p>
   </div>
 
-  <div class="tally-grid">
-    <div class="tally-card">
-      <h3 class="tally-card-title">On the Floor</h3>
-      <div class="tally-stats">
-        <div class="tally-stat"><span class="tally-num" id="floorStatPass">0</span><span class="tally-lbl">Carried</span></div>
-        <div class="tally-stat"><span class="tally-num" id="floorStatFail">0</span><span class="tally-lbl">Voted down</span></div>
-        <div class="tally-stat"><span class="tally-num" id="floorStatOpen">0</span><span class="tally-lbl">Still open</span></div>
-      </div>
-      <ul class="tally-list" id="floorTallyList"></ul>
-    </div>
+  <button class="link archive-toggle" id="btnTallyArchive" type="button" aria-expanded="false">Show the tally</button>
 
-    <div class="tally-card">
-      <h3 class="tally-card-title">Draft Availability</h3>
-      <ul class="tally-list" id="draftTallyList"></ul>
+  <div id="tallyArchive" hidden>
+    <div class="tally-grid">
+      <div class="tally-card">
+        <h3 class="tally-card-title">On the Floor</h3>
+        <div class="tally-stats">
+          <div class="tally-stat"><span class="tally-num" id="floorStatPass">0</span><span class="tally-lbl">Carried</span></div>
+          <div class="tally-stat"><span class="tally-num" id="floorStatFail">0</span><span class="tally-lbl">Voted down</span></div>
+          <div class="tally-stat"><span class="tally-num" id="floorStatOpen">0</span><span class="tally-lbl">Still open</span></div>
+        </div>
+        <ul class="tally-list" id="floorTallyList"></ul>
+      </div>
+
+      <div class="tally-card">
+        <h3 class="tally-card-title">Draft Availability</h3>
+        <ul class="tally-list" id="draftTallyList"></ul>
+      </div>
     </div>
   </div>
 </section>
@@ -2361,6 +2365,11 @@ $("btnFloorArchive").addEventListener("click",function(){
 $("btnDraftArchive").addEventListener("click",function(){
   var pnl=$("draftArchive"); pnl.hidden=!pnl.hidden;
   this.textContent=pnl.hidden?"Show the 2026-2027 draft availability archive":"Hide the 2026-2027 draft availability archive";
+  this.setAttribute("aria-expanded",pnl.hidden?"false":"true");
+});
+$("btnTallyArchive").addEventListener("click",function(){
+  var pnl=$("tallyArchive"); pnl.hidden=!pnl.hidden;
+  this.textContent=pnl.hidden?"Show the tally":"Hide the tally";
   this.setAttribute("aria-expanded",pnl.hidden?"false":"true");
 });
 /* voting window: 12:00 AM ET Sunday Aug 16 through 12:00 AM ET Sunday Aug 23, 2026 */
