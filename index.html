@@ -1346,28 +1346,32 @@ body.shake{animation:pageShake .42s ease}
 <section class="sec" id="floor">
   <div class="sec-head">
     <h2>On the Floor</h2>
-    <p>Amendments up for a vote ahead of 2026-2027. A majority carries it.</p>
+    <p>Amendments voted on ahead of 2026-2027. A majority carried each one.</p>
     <div class="vote-status" id="voteStatus"></div>
   </div>
 
-  <div class="auth-card" id="authCard">
-    <h3 class="auth-card-title" id="authCardTitle">Log in to vote</h3>
-    <div class="auth-box" id="authBox"></div>
+  <button class="link" id="btnFloorArchive" type="button" aria-expanded="false">Show the 2026-2027 floor archive</button>
+
+  <div id="floorArchive" hidden>
+    <div class="auth-card" id="authCard">
+      <h3 class="auth-card-title" id="authCardTitle">Log in to vote</h3>
+      <div class="auth-box" id="authBox"></div>
+    </div>
+
+    <ul class="floor-rules">
+      <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
+      <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 15</strong>.</li>
+      <li>New rules take effect before the season starts.</li>
+    </ul>
+
+    <div class="shelf" style="margin:26px auto"></div>
+
+    <div class="floor-head">
+      <span class="src" id="floorCount"></span>
+    </div>
+
+    <div id="props"></div>
   </div>
-
-  <ul class="floor-rules">
-    <li>Rule change polls require a <strong>majority vote in favor</strong> of the change to pass — ties do not pass.</li>
-    <li>Rule changes must be submitted by <strong>11:59 PM ET, Saturday, August 15</strong>.</li>
-    <li>New rules take effect before the season starts.</li>
-  </ul>
-
-  <div class="shelf" style="margin:26px auto"></div>
-
-  <div class="floor-head">
-    <span class="src" id="floorCount"></span>
-  </div>
-
-  <div id="props"></div>
 </section>
 
 <!-- ================= draft availability ================= -->
@@ -2254,7 +2258,9 @@ var DEFAULT_RULES=[
   {t:"IR roster spots",b:"Two IR slots per roster.",y:2023},
   {t:"The loser's toll",b:"Last place pays the commissioner an extra $10, put toward the winner's nameplate and shipping the trophy.",y:2025},
   {t:"Bench roster spots",b:"Six bench spots per roster.",y:2025},
-  {t:"Draft order",b:"Set by a spin wheel one week before the draft — not an auto-pick at kickoff.",y:2025}
+  {t:"Draft order",b:"Set by a spin wheel one week before the draft — not an auto-pick at kickoff.",y:2025},
+  {t:"Jackson sucks",b:"Jackson starts every week at negative 50.",y:2026},
+  {t:"Playoff waiver wire",b:"Once the playoffs start, only playoff teams may use the waiver wire.",y:2026}
 ];
 function renderRules(){
   var ol=$("rulesList"); ol.innerHTML="";
@@ -2333,6 +2339,11 @@ var SEED_FLOOR=[
    desc:"Part 1 (pick one) \u2014 what defines a \u201Closer\u201D?\n\u203A Whoever has the worst record at the end of week 14?\n\u203A Whoever has the worst record at the very end?\n\nIf the latter, then Part 2 (yes or no):\n\u203A At the start of week 15 / the playoffs, those not in the playoffs cannot touch the waiver wire, but are welcome to pick from free agents after the fact.",
    why:"We never really decided what \u201Closer\u201D actually meant.",note:""}
 ];
+$("btnFloorArchive").addEventListener("click",function(){
+  var pnl=$("floorArchive"); pnl.hidden=!pnl.hidden;
+  this.textContent=pnl.hidden?"Show the 2026-2027 floor archive":"Hide the 2026-2027 floor archive";
+  this.setAttribute("aria-expanded",pnl.hidden?"false":"true");
+});
 /* voting window: 12:00 AM ET Sunday Aug 16 through 12:00 AM ET Sunday Aug 23, 2026 */
 var VOTE_OPEN=new Date("2026-08-16T04:00:00Z"), VOTE_CLOSE=new Date("2026-08-23T04:00:00Z");
 function votingPhase(){
