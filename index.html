@@ -772,6 +772,15 @@ input{font:inherit}
 .prop-strike:hover{color:#C97A6A}
 .src{font-family:var(--ui);font-weight:600;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:rgba(199,162,69,.75)}
 
+/* ================= season runbook ================= */
+.runbook-list{list-style:none;margin:14px 0 0;padding:0}
+.runbook-item{display:flex;align-items:flex-start;gap:12px;padding:10px 2px;border-top:1px solid rgba(199,162,69,.14)}
+.runbook-item:first-child{border-top:0}
+.runbook-item input[type=checkbox]{margin-top:3px;width:16px;height:16px;flex:0 0 auto;accent-color:var(--brass);cursor:pointer}
+.runbook-item label{font-size:14px;line-height:1.55;color:var(--ivory-dim);cursor:pointer}
+.runbook-item.done label{color:rgba(200,193,178,.4);text-decoration:line-through}
+.runbook-step{font-family:var(--ui);font-weight:700;color:var(--brass);margin-right:2px}
+
 /* ================= draft order ================= */
 .order-video{
   position:relative;width:100%;max-width:640px;aspect-ratio:16/9;margin:0 auto 28px;border-radius:6px;overflow:hidden;
@@ -1486,6 +1495,17 @@ body.shake{animation:pageShake .42s ease}
       </div>
       <p class="note">Paste any Google Sheets link — the page works out the export address itself. If Google refuses it, open the sheet and use File → Share → Publish to web → Form Responses → CSV, then paste that link. Submissions land alongside anything typed above.</p>
       <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+  <div class="tuck">
+    <button class="link" id="btnRunbookToggle">Season runbook</button>
+    <div class="paper" id="runbookPanel" hidden>
+      <p class="note">The rough season timeline, start to finish — not automated yet, just tracked here so nothing gets missed. Check items off as you go; reset before next season starts.</p>
+      <ol class="runbook-list" id="runbookList"></ol>
+      <div class="btn-row">
+        <button class="btn" id="btnRunbookReset">Reset for next season</button>
+      </div>
     </div>
   </div>
 </section>
@@ -2403,6 +2423,51 @@ function renderDraftOrder(){
 }
 renderDraftOrder();
 
+/* ---------- season runbook ---------- */
+/* the rough season timeline, tracked here until it's actually automated */
+var RUNBOOK_STEPS=[
+  "Open rule submissions for 2 weeks, starting the first Monday of September.",
+  "Send the season kickoff message (Telegram + text chain): welcome everyone back, rule submissions are open, when they close, and when voting starts.",
+  "24 hours before submissions close: send a reminder that submissions are ending and voting starts next.",
+  "Close rule submissions. Open “On the Floor” and “When Works for the Draft” voting for 1 week.",
+  "Send a message: voting is live, and when it closes.",
+  "24 hours before voting closes: send a reminder.",
+  "Close voting. Send out the results, and push the newly passed commandments to the site.",
+  "In that same message, tell everyone the draft order will be spun exactly 1 week before the draft, and the video + order will be posted to the site then.",
+  "Send the Venmo collection message.",
+  "Update the ESPN league site with any passed rule changes that apply there.",
+  "Do the draft order spin (Wheel of Names) — record it, then upload the video and order to the Draft Order section.",
+  "Send a message with the draft order results and a reminder of the draft day/time.",
+  "Day of the draft: send a final reminder."
+];
+var runbookDone=[];
+function renderRunbook(){
+  var ol=$("runbookList"); if(!ol) return;
+  ol.innerHTML="";
+  RUNBOOK_STEPS.forEach(function(step,i){
+    var li=document.createElement("li");
+    li.className="runbook-item"+(runbookDone[i]?" done":"");
+    var cid="runbookStep"+i;
+    li.innerHTML='<input type="checkbox" id="'+cid+'"'+(runbookDone[i]?" checked":"")+'>'+
+      '<label for="'+cid+'"><span class="runbook-step">'+(i+1)+'.</span> '+esc(step)+'</label>';
+    ol.appendChild(li);
+    li.querySelector("input").addEventListener("change",function(){
+      runbookDone[i]=this.checked;
+      li.classList.toggle("done",this.checked);
+      saveRunbook();
+    });
+  });
+}
+function saveRunbook(){ store.set("ffm:runbook",JSON.stringify(runbookDone)); }
+$("btnRunbookReset").addEventListener("click",function(){
+  if(!confirm("Reset the runbook checklist for next season?")) return;
+  runbookDone=[]; saveRunbook(); renderRunbook();
+});
+$("btnRunbookToggle").addEventListener("click",function(){
+  var pnl=$("runbookPanel"); pnl.hidden=!pnl.hidden;
+  this.textContent=pnl.hidden?"Season runbook":"Hide the season runbook";
+});
+
 /* ---------- the floor ---------- */
 /* what has come in through the form so far, so the floor is never blank */
 var SEED_FLOOR=[
@@ -2909,7 +2974,7 @@ sb.auth.onAuthStateChange(function(event,sess){
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
 });
-Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),store.get("ffm:floor")])
+Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),store.get("ffm:floor"),store.get("ffm:runbook")])
 .then(function(v){
   var stored=null;
   try{ stored=v[0]?JSON.parse(v[0]):null; }catch(e){ stored=null; }
@@ -2919,10 +2984,12 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   try{ floor=v[3]?JSON.parse(v[3]):[]; }catch(e){ floor=[]; }
   if(!Array.isArray(floor)) floor=[];
   floor=floor.concat(SEED_FLOOR);
+  try{ runbookDone=v[4]?JSON.parse(v[4]):[]; }catch(e){ runbookDone=[]; }
+  if(!Array.isArray(runbookDone)) runbookDone=[];
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
   $("summary").hidden=!ADMIN;
-  renderPlates(); renderRules(); renderAuth(); renderFloor();
+  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
   var url=new URLSearchParams(location.search).get("csv")||v[1]||SHEET_URL;
@@ -2930,11 +2997,11 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   loadUrl(url,true);
 })
 .catch(function(){
-  seasons=blankSeasons(); rules=DEFAULT_RULES.slice(); floor=SEED_FLOOR.slice();
+  seasons=blankSeasons(); rules=DEFAULT_RULES.slice(); floor=SEED_FLOOR.slice(); runbookDone=[];
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
   $("summary").hidden=!ADMIN;
-  renderPlates(); renderRules(); renderAuth(); renderFloor();
+  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
 });
