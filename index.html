@@ -1378,12 +1378,16 @@ body.shake{animation:pageShake .42s ease}
 <section class="sec" id="draft">
   <div class="sec-head">
     <h2>When Works for the Draft</h2>
-    <p>Mark every start time you could make it — whichever slot has the most overlap wins.</p>
+    <p>Marked ahead of the 2026-2027 draft — the slot with the most overlap won.</p>
     <div class="vote-status" id="draftVoteStatus"></div>
   </div>
 
-  <div class="avail-notice" id="availNotice"></div>
-  <div class="avail-grid" id="availGrid"></div>
+  <button class="link" id="btnDraftArchive" type="button" aria-expanded="false">Show the 2026-2027 draft availability archive</button>
+
+  <div id="draftArchive" hidden>
+    <div class="avail-notice" id="availNotice"></div>
+    <div class="avail-grid" id="availGrid"></div>
+  </div>
 </section>
 
 <!-- ================= the tally ================= -->
@@ -2344,6 +2348,11 @@ var SEED_FLOOR=[
 $("btnFloorArchive").addEventListener("click",function(){
   var pnl=$("floorArchive"); pnl.hidden=!pnl.hidden;
   this.textContent=pnl.hidden?"Show the 2026-2027 floor archive":"Hide the 2026-2027 floor archive";
+  this.setAttribute("aria-expanded",pnl.hidden?"false":"true");
+});
+$("btnDraftArchive").addEventListener("click",function(){
+  var pnl=$("draftArchive"); pnl.hidden=!pnl.hidden;
+  this.textContent=pnl.hidden?"Show the 2026-2027 draft availability archive":"Hide the 2026-2027 draft availability archive";
   this.setAttribute("aria-expanded",pnl.hidden?"false":"true");
 });
 /* voting window: 12:00 AM ET Sunday Aug 16 through 12:00 AM ET Sunday Aug 23, 2026 */
