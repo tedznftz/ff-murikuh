@@ -787,6 +787,7 @@ input{font:inherit}
   border:1px solid rgba(199,162,69,.3);background:rgba(0,0,0,.35);box-shadow:0 20px 40px rgba(0,0,0,.5);
 }
 .order-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.order-video-link{position:absolute;inset:0;margin:auto;width:max-content;height:max-content}
 .order-placeholder{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;
   font-size:14px;font-style:italic;line-height:1.6;color:var(--ivory-dim);
@@ -2397,19 +2398,24 @@ $("btnAddRule").addEventListener("click",function(){
 /* ---------- draft order ---------- */
 /* set once the wheel spin is actually recorded — a YouTube link (unlisted is fine) and the resulting order */
 var DRAFT_ORDER={
-  video:"",
+  video:"https://youtube.com/shorts/LJ1yef2infg?feature=share",
   order:[]
 };
 function youtubeEmbed(url){
   var m=String(url||"").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{6,})/);
-  return m?("https://www.youtube.com/embed/"+m[1]):url;
+  return m?("https://www.youtube.com/embed/"+m[1]):null;
 }
 function renderDraftOrder(){
   var vid=$("orderVideo"), list=$("orderList");
   if(!vid||!list) return;
-  vid.innerHTML=DRAFT_ORDER.video
-    ? '<iframe src="'+esc(youtubeEmbed(DRAFT_ORDER.video))+'" title="Draft order spin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
-    : '<div class="order-placeholder">Recorded live on the Wheel of Names once the spin happens — Monday, Aug 31 @ 7:00 PM ET.<br>Video goes up here right after, so nobody has to take our word for it.</div>';
+  var ytEmbed=DRAFT_ORDER.video?youtubeEmbed(DRAFT_ORDER.video):null;
+  if(ytEmbed){
+    vid.innerHTML='<iframe src="'+esc(ytEmbed)+'" title="Draft order spin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  }else if(DRAFT_ORDER.video){
+    vid.innerHTML='<a class="btn order-video-link" href="'+esc(DRAFT_ORDER.video)+'" target="_blank" rel="noopener noreferrer">Watch the draft order spin</a>';
+  }else{
+    vid.innerHTML='<div class="order-placeholder">Recorded live on the Wheel of Names once the spin happens — Monday, Aug 31 @ 7:00 PM ET.<br>Video goes up here right after, so nobody has to take our word for it.</div>';
+  }
   list.innerHTML="";
   if(!DRAFT_ORDER.order.length){
     list.innerHTML='<li class="order-empty">Order not set yet — check back after Aug 31.</li>';
