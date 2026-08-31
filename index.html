@@ -2406,8 +2406,10 @@ function youtubeEmbed(url){
   return m?("https://www.youtube.com/embed/"+m[1]):null;
 }
 function renderDraftOrder(){
-  var vid=$("orderVideo"), list=$("orderList");
+  var sec=$("draftOrder"), vid=$("orderVideo"), list=$("orderList");
   if(!vid||!list) return;
+  if(sec) sec.hidden=!session;
+  if(!session) return;
   var ytEmbed=DRAFT_ORDER.video?youtubeEmbed(DRAFT_ORDER.video):null;
   if(ytEmbed){
     vid.innerHTML='<iframe src="'+esc(ytEmbed)+'" title="Draft order spin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
@@ -2976,7 +2978,7 @@ sb.auth.onAuthStateChange(function(event,sess){
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
   $("summary").hidden=!ADMIN;
-  renderAuth(); renderRules(); renderPlates();
+  renderAuth(); renderRules(); renderPlates(); renderDraftOrder();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
 });
@@ -2995,7 +2997,7 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
   $("summary").hidden=!ADMIN;
-  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook();
+  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook(); renderDraftOrder();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
   var url=new URLSearchParams(location.search).get("csv")||v[1]||SHEET_URL;
@@ -3007,7 +3009,7 @@ Promise.all([store.get("ffm:base"),store.get("ffm:url"),store.get("ffm:rules"),s
   ADMIN=computeAdmin();
   $("adminPanel").hidden=!ADMIN;
   $("summary").hidden=!ADMIN;
-  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook();
+  renderPlates(); renderRules(); renderAuth(); renderFloor(); renderRunbook(); renderDraftOrder();
   refreshVotes().then(renderFloor);
   refreshAvailability().then(renderAvailability);
 });
